@@ -1,0 +1,100 @@
+@use '../globals' as g;
+@use '../util' as u;
+
+.main_about{
+  width: 100%;
+  padding: 1.1rem;
+  box-sizing: border-box;
+
+  @include u.breakpoint("large"){
+    width: 78%;
+    margin: 0 auto;
+  }
+
+  &__title{
+    font-size: 2rem;
+    font-family: g.$font;
+
+    @include u.breakpoint("large"){
+      font-size: 2.1rem;
+    }
+
+    @include u.breakpoint-down("medium"){
+      font-size: 2rem;
+    }
+    
+    @include u.breakpoint-down("small"){
+      font-size: 1.4rem;
+    }
+
+  }
+
+  &__paragraph{
+    font-size: .9rem;
+    width: 100%;
+    text-shadow: 0 0 20px #000;
+
+    @include u.breakpoint("large"){
+      font-size: 1.2rem;
+    }
+    @include u.breakpoint-down("medium"){
+      font-size: 1.1rem;
+    }
+    @include u.breakpoint-down("small"){
+      font-size: .9rem;
+    }
+    
+    & > em{
+      color: g.$primaryColor;
+      font-weight: 900;
+    }
+
+    & > span{
+      color: #ff7300;
+      font-weight: 900;
+    }
+  }//end paragrapg
+
+  &__list{
+    @include g.mix-flex-aligment(space-evenly);
+
+    &__item{
+      text-align: center;
+      position: relative;
+
+      &::after{
+        content: '';
+        background-color: #0009;
+        filter: blur(12px);
+        z-index: -1;
+        position: absolute;
+        top: 20%;
+        right: 0;
+        width: 100%;
+        height: 80%;
+
+        @include u.breakpoint-down("medium"){
+          transform: scale(1);
+        }
+        @include u.breakpoint-down("small"){
+          transform: scale(.7);
+        }
+
+      }//end ::after
+
+      &__logo{
+        height: 89px;
+
+        @include u.breakpoint("large"){
+          transform: scale(1.02);
+        }
+        @include u.breakpoint-down("medium"){
+          transform: scale(1);
+        }
+        @include u.breakpoint-down("small"){
+          transform: scale(.7);
+        }
+      }
+    }//end item
+  }//end list
+}//end main_about

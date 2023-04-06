@@ -1,0 +1,19 @@
+@use 'sass:math';
+
+@function f-pixel2rem($pixel){
+  @if not math.is-unitless($pixel){
+    @error "No debe usar unidades, solo numeros";
+  }
+  @else{
+    @return math.div($pixel, 16) * 1rem;
+  }
+}
+
+@function f-pixel2em($pixel){
+  @if not math.is-unitless($pixel){
+    @error "No debe usar unidades, solo numeros";
+  }
+  @else{
+    @return math.div($pixel, 16) * 1em;
+  }
+}

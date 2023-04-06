@@ -1,0 +1,63 @@
+@use '../util/' as u;
+
+
+.coldDown_an {
+  animation-name: coldDown;
+  animation-duration: .4s;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: forwards;
+}
+
+@keyframes coldDown {
+  from {
+    display: none;
+    opacity: 0;
+    transform: translateY(-10px) scale(1.2);
+  }
+  to {
+    display: flex;
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+//uso directo
+@keyframes underlineOnce {
+  0% {
+    clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+  }
+  100% {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
+}
+
+@keyframes shake {
+  0% {
+    transform: translate(0, 0);
+    transform: scale(0.8);
+  }
+  10%,
+  90% {
+    transform: translate(-5px, 0);
+  }
+  20%,
+  80% {
+    transform: translate(5px, 0);
+  }
+  30%,
+  50%,
+  70% {
+    transform: translate(-5px, 0);
+  }
+  40%,
+  60% {
+    transform: translate(5px, 0);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+.shake-an {
+  animation-name: shake;
+  animation-duration: 0.7s;
+}
