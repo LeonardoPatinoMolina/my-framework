@@ -56,8 +56,8 @@ export class Component {
    * @param {{key: string, props: {[string]:anu}}} args 
    */
   constructor(args) {
-    this.props = args.props;
-    this.key = args.key;
+    this.props = args?.props;
+    this.key = args?.key;
     this.emitter = new MyEventMediator();
     this.life = new LifeComponent(this);
     this.#create();
