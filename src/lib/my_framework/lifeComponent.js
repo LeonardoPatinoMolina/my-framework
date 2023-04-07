@@ -31,6 +31,11 @@ export class LifeComponent {
       }
     }//end if
   }//end $
+
+  update(){
+    this.#owner._disposing.forEach(d=>d());
+    this.#owner._updating.forEach(u=>u())
+  }
 }//end class
 
 //---------------------------------------------

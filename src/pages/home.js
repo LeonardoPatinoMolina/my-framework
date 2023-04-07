@@ -1,31 +1,41 @@
 import { Component } from "../lib/my_framework/component.js";
-import { Router } from "../lib/my_framework/router.js";
-// import { Card } from "./components/card/index.js";
+// import { Router } from "../lib/my_framework/router.js";
+// import { Card } from "../components/card.js";
+// import { fetchCacheInterceptor } from "../lib/utils.js";
+import { Header } from "../components/header.js";
+import { MyDOM } from "../lib/my_framework/myDOM.js";
 
 export class Home extends Component{
   static name = 'app'
   
   constructor(){
     super({
-      props: {
-        title: 'Home',
+      props:{
+        isReady: false,
+        title: 'App'
       },
-      key: 'component-home'
+      key: 'component-home',
     });
   }
 
-  init(){
-    this.body.addEventListener('click',()=>{
-      const r = new Router();
-      r.go("/header");
-    })
+  ready(){
+    this.life.$(()=>{
+      this.body.addEventListener('click',()=>{
+        // new Router().go('/header')
+        this.props.isReady = !this.props.isReady;
+        this.update();
+        // MyDOM.removeMember(this)
+      })
+    })//end life
+  }//end init
 
-  }
+  build({title, isReady, data}){
 
-  template(){
     return super.template(`
-    <main>
-      ${this.props.title}
+    <main id="main">
+      ${title}
+      <br/>
+      ${isReady && new Header({key: '0101'}).attach(this)}
     </main>
     `);
   }
@@ -38,3 +48,13 @@ export class Home extends Component{
     //       this.props.data = res;
     //     });
     //   });
+
+      //  fetchCacheInterceptor('https://jsonplaceholder.typicode.com/users',{cacheName: 'users',revalidate: 60})
+  //     .then((res)=>{
+  //       this.props.data = res;
+  //     })
+  //     .finally(()=>{
+  //       this.update(()=>{
+  //         this.props.isReady = true;
+  //       })
+  //     })

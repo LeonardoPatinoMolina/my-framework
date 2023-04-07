@@ -1,5 +1,5 @@
 import { Component } from "./component.js";
-import { getRoot } from "./root.js";
+import { MyDOM } from "./myDOM.js";
 
 export class Router {
   /**
@@ -43,13 +43,19 @@ export class Router {
      *@type {Component}
      */
     const component = this.pages[path] || this.#notFound; 
-    getRoot().innerHTML = '';
-    new component().render(getRoot());
+    
+    MyDOM.clearDOM();
+    const dom = new MyDOM();
+    new component().render(dom.root);
     this.currentPath = path;
   }
 
   go(path){
+    if(!Object.entries(this.pages).flat().includes(path)) return;
     window.history.pushState({}, path, window.location.origin + path);
+
+    const page = new this.pages[this.currentPath]()
+    page.emitter.emit(`${page.key}-EVENT`);
     this.#renderRoute();
   }
 }

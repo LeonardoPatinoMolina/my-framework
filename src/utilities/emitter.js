@@ -1,63 +1,60 @@
-/**
- * Clase encargada de mediar entre distintos eventos 
- */
-export class MyEventMediator {
-  /**
-   * @type {EventTarget}
-   */
-  #eventEmitter;
+// import { Component } from "./component.js";
 
-  /**
-   * @type {Array<{eventName: string, listener:(CustomEvent)=>void}>}
-   */
-  #observers = [];
+// /**
+//  * Clase encargada de mediar entre distintos eventos 
+//  */
+// export class MyEventMediator {
+//   /**
+//    * @type {Array<{eventName: string, component:Component}>}
+//    */
+//   #observers = [];
+//   /**
+//    * @type {Array<string>}
+//    */
+//   #observersKeys = []
   
-  constructor() {
-    // crea un objeto target de eventos personalizado
-    this.#eventEmitter = new EventTarget()
-  }
+//   /**
+//    * Método encargado de emitir el evento, en este método
+//    * podemos propagar un evento dado, enviando datos por una propiedad detail
+//    * @param {string}  eventName
+//    * @param {any}  detail
+//    */
+//   emit(eventName, detail) {
+//     const observers2Emit = this.#observers.filter(o=> o.eventName === eventName);
+//     observers2Emit.forEach(o=>{
+//       o.component.notify(detail);
+//     })
+//   }
   
-  /**
-   * Método encargado de emitir el evento, en este método
-   * podemos propagar un evento dado, enviando datos por una propiedad detail
-   * @param {string}  eventName
-   * @param {any}  detail
-   */
-  emit(eventName, detail ) {
-    // haz algo aquí
-    this.#eventEmitter.dispatchEvent(new CustomEvent(eventName, {detail}));
-  }
-  
-  /**
-   * Método que subscribe un observer a un evento personalizado,
-   * @param {string} eventName
-   * @param {(CustomEvent)=>void} eventName
-   */
-  on(eventName, listener) {
-    this.#eventEmitter.addEventListener(eventName, listener);
-    const newObserver = {eventName,listener}
-    if(!this.#observers.includes(newObserver)){
-      this.#observers.push(newObserver)
-    }else throw new Error('observer existente: el observer que intenta subscribir ya se encuentra en existencia')
-  }
-  /**
-   *  método para eliminar un EventListener del evento personalizado
-   * @param {string} eventName
-   * @param {(CustomEvent)=>void} eventName
-   */
-  off(eventName, listener) {
-    const observer = {eventName,listener}
-    if(!this.#observers.includes(observer)) throw new Error('el presente observer no existe en el presente mediador');
+//   /**
+//    * Método que subscribe un observer a un evento personalizado,
+//    * @param {string} eventName
+//    * @param {Component} component
+//    */
+//   on(eventName, component) {
 
-    this.#eventEmitter.removeEventListener(eventName, listener);
-    this.#observers = this.#observers.filter((o)=>observer !== o);
-  }
-  /**
-   * método para eliminar todos los eventos de la presente instancia
-   */
-  offAll() {
-    this.#observers.forEach((o=>{
-      this.#eventEmitter.removeEventListener(o.eventName, o.listener);
-    }));
-  }
-}
+//     const newObserver = {eventName,component}
+//     if(!this.#observersKeys.includes(component.key)){
+//       this.#observers.push(newObserver)
+//       this.#observersKeys.push(component.key)
+//     }
+//   }
+//   /**
+//    *  método para eliminar un EventListener del evento personalizado
+//    * @param {string} eventName
+//    * @param {Component} component
+//    */
+//   off(eventName, component) {
+//     const observer = {eventName, component, key: component.key}
+//     if(!this.#observers.includes(observer)) throw new Error('el presente observer no existe en el presente mediador');
+
+//     this.#observers = this.#observers.filter((o)=>observer !== o);
+//   }
+//   /**
+//    * método para eliminar todos los eventos de la presente instancia
+//    */
+//   offAll() {
+//     this.#observers = []
+//     this.#observersKeys = []
+//   }
+// }

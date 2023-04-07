@@ -1,19 +1,13 @@
 import { Component } from "../lib/my_framework/component.js";
 
 export class Header extends Component{
-  static name = 'header';
-  constructor(){
-    super({
-      key: 'header-component',
-      props:{
-        title: 'header'
-      }
-    })
+  constructor(args){
+    super({...args, props:{title: 'header'}})
   }
 
-  template(){
+  build({title}){
     return super.template(`
-      <header >${this.props.title}</header>
+      <header >${title}</header>
     `)
   }
 }
