@@ -9,9 +9,9 @@ export class Router {
   static instanceRouter;
 
   /**
-   * @type {string}
+   * @type {Component}
    */
-  currentPath;
+  currentPage;
   /**
    * @type {Object<string, typeof Component>}
    */
@@ -23,7 +23,7 @@ export class Router {
   #notFound;
 
   /**
-   * @param {{pages: Object.<string, typeof Component>, notFound: typeof Component}} args 
+   * @param {{pages: Object.<string, typeof Component>, notFound: typeof Component}=} args 
    */
   constructor(args){
     if(!!Router.instanceRouter){
@@ -46,16 +46,20 @@ export class Router {
     /**
      *@type {typeof Component}
      */
-    const component = this.pages[path] || this.#notFound; 
+    const page = this.pages[path] ?? this.#notFound; 
     
-    MyDOM.clearDOM();
     const dom = new MyDOM();
-    new component().render(dom.root);
-    this.currentPath = path;
+    MyDOM.clearDOM();
+
+    const newPage = new page();
+    newPage.render(dom.root);
+
+    this.currentPage?.clear();
+    this.currentPage = newPage;
   }
 
   /**
-   * 
+   * Método encargado de navegar a otra página
    * @param {string} path 
    * @returns 
    */
@@ -63,9 +67,6 @@ export class Router {
     if(!Object.entries(this.pages).flat().includes(path)) return;
     window.history.pushState({}, path, window.location.origin + path);
 
-    const page = new this.pages[this.currentPath]()
-    page.clear();
-    MyDOM.clearDOM();
     this.#renderRoute();
   }
 }

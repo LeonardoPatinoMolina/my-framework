@@ -1,8 +1,8 @@
 import { Component } from "../lib/my_framework/component.js";
-// import { Router } from "../lib/my_framework/router.js";
-// import { Card } from "../components/card.js";
-// import { fetchCacheInterceptor } from "../lib/utils.js";
+import { RuleHome } from "../rules/home.rule.js";
 import { Header } from "../components/header.js";
+import { setUser } from "../context/feature/user.js";
+import { MyGlobalStore } from "../lib/my_framework/GlobalStore.js";
 
 export class Home extends Component{
   constructor(){
@@ -11,39 +11,27 @@ export class Home extends Component{
         isReady: false,
         title: 'App'
       },
-      key: 'component-home',
+      key: 'home-page',
     });
   }
 
   init(){
+    const data = MyGlobalStore.subscribe('user',this);
   }
-  ready(){
-    this.props.hola = 'parangana'  
-    this.$.effect(()=>{
-      this.body.addEventListener('click',()=>{
-        this.props.isReady = !this.props.isReady
-        this.update();
-      })//end eventlistener
-      
-      console.log('reaccion');
-      return ()=>{
-        this.body.removeEventListener('click',()=>{
-          this.props.isReady = !this.props.isReady
-          this.update();
-        })//end eventlistener
-      }
-    })
 
+  ready(){
+    RuleHome(this);
   }//end init
 
-  build({title, isReady, hola}){
+  build({title, isReady, hola},props){
 
     return super.template(`
-    <main id="main" style="background:red;">
+    <main style="background:red;">
       ${title}
-      ${hola}
+      <button class="link">Header</button>
+      <button class="r">open</button>
       <br/>
-      ${isReady && new Header({key: '0101'}).attach(this)}
+      ${isReady && new Header().attach(this)}
     </main>
     `);
   }

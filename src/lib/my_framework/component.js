@@ -7,21 +7,21 @@ import { MyDOM } from "./myDOM.js";
  * Clase de declaración de componente
  */
 export class Component {
-  /** flag que determina si el compoente se encuentra
+  /** flag que determina si el componente se encuentra
    * o no, previamnte inicializado
    * @type {boolean}
    */
   #initialized;
 
-  /** valor único que desitingue al component dentro del virtual DOM
-   * de los demaás componentes
+  /** valor único que desitingue al componente dentro del virtual DOM
+   * de los demás componentes
    * @type {string}
    */
   #key;
 
   /** espacio de memoria dedicado a almacenar el estado previo del 
    * componente para veirificaciones de reactividad
-   * @type {{}}
+   * @type {any}
    */
   #previusState;
 
@@ -31,6 +31,12 @@ export class Component {
    * @type {any}
    */
   props;
+  /** Propiedades globales a las cualesl el componente se
+   * encuentra subscrito, en esecnai se trata del estado global
+   * de la app
+   * @type {any}
+   */
+  gloProps;
 
   /** Atributo encargado de subscribir lógica al ciclo de
    * vida del componente
@@ -67,6 +73,9 @@ export class Component {
   get key(){
     return this.#key;
   }
+  get isInitialized(){
+    return this.#initialized;
+  }
   //SETTERS------------------
   /**
    * @param {string} k
@@ -101,20 +110,24 @@ export class Component {
    * con la finalidad de inicializar props
    */
   init(){/*método que se espera sea sobre escrito */}
+
   /**
    * Método encargado de ejecutarse cuando el nodo HTML que 
    * representa al componente se encuentre disponible
    */
   ready(){/*método que se espera sea sobre escrito */}
+
   /**
    * función encargada de ejecutar lógica previa a la 
    * construcción de la plantilla
-   * @param {{}} props
+   * @param {any=} props
+   * @param {any=} globalProps
    * @returns {string}
    */
-  build(props){
+  build(props, globalProps){
     throw new Error('Método sin implementar por clase deribada');
   }
+
   /**
    * Método especializado se jecuta al renderizar el componente
    */
@@ -128,16 +141,16 @@ export class Component {
     } catch (error) {
       console.error(error);
     }
-  };
+  }
 
   /**
    * Método especializado se ejecuta al des-renderizar el componente
   */
  #didUnmount(){
-  console.log('unm', this.key);
     if(!this.#initialized) return;
     this.$.dispose();
   }
+
   /**
    * Método especializado se ejecuta al des-renderizar el componente
   */
@@ -152,12 +165,12 @@ export class Component {
    */
   #create(wait = false) {
     //convertimos el template a un nodo del DOM
-    const componentNode = string2html(this.build(this.props));
+    const componentNode = string2html(this.build(this.props, this.gloProps));
     this.body = componentNode;
     
     if(!wait)this.#didMount();
     return this;
-  };//end method
+  }//end method
   
   /**
    * Encargado de generar la plantilla del componente
@@ -169,7 +182,7 @@ export class Component {
     const regex = /\b(?:true|false|undefined)\b/gi;
     templatetext = templatetext.replace(regex,'');
     return templatetext;
-  };//end method
+  }//end method
 
   /**
    * Encargada de acoplar el componente hijo al padre y retornar una raíz para futuro renderizado
@@ -187,15 +200,15 @@ export class Component {
   /**
    * Método encargado de actualizar un componente que lo requiera,
    * es decir, un componente mutable
-   * @param {(()=>void) | boolean} callback 
+   * @param {(()=>void)=} callback 
+   * @param {boolean=} isGlobalChange 
   */
- update(callback = false) {
-  //@ts-ignore
+ update(callback, isGlobalChange) {
    if(callback) callback();
    
    const compare =JSON.stringify(this.props) === JSON.stringify(this.#previusState);
-   
-   if(compare) return;
+
+   if(compare && !isGlobalChange) return;
    this.#didUnmount();
     
     const previusBody = this.body;
@@ -209,7 +222,11 @@ export class Component {
       child.render(root, false);
     })
     previusBody.replaceWith(fr);
-    this.#previusState = this.props ? structuredClone(this.props) : undefined;
+
+    //establecemos el estado actual como previo en 
+    //espera de una proxima comparación
+    this.#previusState.local = this.props ? structuredClone(this.props) : undefined;
+    this.#previusState.global = this.gloProps ? structuredClone(this.gloProps) : undefined;
     this.#didUpdate();
   }//end method
 
@@ -249,18 +266,12 @@ export class Component {
   }
 
   /**
-   * Método que limpiar cada registro del componente y de sus hijos, se espera que este método
+   * Método que establece que el componente y de sus hijos, se espera que este método
    * sea empleado al momento de cambiar de página en el enrutador.
    */
   clear(){
     this.#didUnmount();
-    this.body = undefined;
-    this.#key = undefined;
-    this.parent = undefined;
-    this.props = undefined;
     this.#initialized = false;
-    this.childrenAttached.forEach(child=>child.clear())
-    this.childrenAttached = [];
   }
 }
 

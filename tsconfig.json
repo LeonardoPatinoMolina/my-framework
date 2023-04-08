@@ -1,4 +1,4 @@
-//pequeña configuración auxiliar para contar con el linter de ts 
+//pequeña configuración auxiliar para contar con el linter de typescript 
 //en el desarrollo del presente proyecto
 {
   "compilerOptions": {

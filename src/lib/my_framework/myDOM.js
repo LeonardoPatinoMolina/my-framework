@@ -1,4 +1,5 @@
 "use strict"
+import { MyGlobalStore } from "./GlobalStore.js";
 import { Component } from "./component.js";
 
 export class MyDOM {
@@ -41,7 +42,13 @@ export class MyDOM {
       }
     }
   }//end createRoot
-
+  /**
+   * 
+   * @param {()=>void} store 
+   */
+  static setGlobalStore(store){
+    store();
+  }
   /**
    * @param {Component} newMember
    * @returns {boolean}

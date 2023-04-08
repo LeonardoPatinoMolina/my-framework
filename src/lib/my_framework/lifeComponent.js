@@ -4,7 +4,7 @@ export class Life {
 
   /**definicion de tipos con fines de organización
    * @typedef {()=>void} DisposeEvent
-   * @typedef {{event: ()=>DisposeEvent | undefined, dependency: Array<any> | undefined, oldDependency: Array<any> | undefined}} UpdateEvent
+   * @typedef {{event: ()=>(DisposeEvent | void), dependency: Array<any> | undefined, oldDependency: Array<any> | undefined}} UpdateEvent
    */
 
   /** Eventos encargados de ejecutarse en cada actualización del
@@ -35,7 +35,7 @@ export class Life {
   }
 
   /**
-   * @param {()=>DisposeEvent} callback
+   * @param {()=>(DisposeEvent | void)} callback
    * @param {Array<any>=} dependency
    */
   effect(callback, dependency){
