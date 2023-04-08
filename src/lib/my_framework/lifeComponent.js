@@ -1,31 +1,42 @@
 import { Component } from "./component.js";
 
 export class Life {
-  /**
-   * @type {Array<{dependency: any[], event: ()=>void, dependency: Array<any>, oldDependency: Array<any>}>}
+
+  /**definicion de tipos con fines de organización
+   * @typedef {()=>void} DisposeEvent
+   * @typedef {{event: ()=>DisposeEvent | undefined, dependency: Array<any> | undefined, oldDependency: Array<any> | undefined}} UpdateEvent
+   */
+
+  /** Eventos encargados de ejecutarse en cada actualización del
+   * owner (componente), este posee dependencias que lo reglan 
+   * a la hora de dispararse o no
+   * @type {Array<UpdateEvent>}
    */
   #updateEvents = [];
-  /**
-   * @type {Array<Set<()=>void>>}
+  
+  /** Eventos encargados de ejecutarse una vez que el
+   * renderizado del owner (componente) finalize
+   * @type {Array<DisposeEvent>}
    */
   #disposeEvents = [];
 
-  /**
+  /** Componente poseedor de la instancia Life
+   * al cual se realiza el seguimiento de su 
+   * ciclo de vida
    * @type {Component}
    */
   #owner;
 
   /**
    * @param {Component} owner
-   * @returns {LifeComponent}
    */
   constructor(owner){
     this.#owner = owner;
   }
 
   /**
-   * @param {()=>void} callback
-   * @param {Array<any> | boolean} dependency
+   * @param {()=>DisposeEvent} callback
+   * @param {Array<any>=} dependency
    */
   effect(callback, dependency){
     const prevValue = [...this.#updateEvents];
@@ -48,8 +59,6 @@ export class Life {
   }//end $
 
   /**
-   * @param {boolean | undefined} isInitial
-   * @returns {boolean}
    */
   update(){
     this.#updateEvents.forEach((upE)=>{
@@ -65,10 +74,11 @@ export class Life {
     this.#disposeEvents.forEach(ev=>ev())
   }//end dispose
 
-  /**
+  /** Encargada de evaluar si las dependencias del
+   * presente evento de actualización han mutado
    * @param {any[]} oldDependency 
    * @param {any[]} dependency 
-   * @returns 
+   * @returns {boolean}
    */
   #checkChange(oldDependency, dependency){
     if (oldDependency === undefined) return true;
@@ -78,6 +88,10 @@ export class Life {
     })
     return c;
   }
+
+  /**
+   * Encargado de disparar los eventos de actualización al menos una vez
+   */
   initialize(){
     this.#updateEvents.forEach((upE)=>{
       const d = upE.event();

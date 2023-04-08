@@ -1,3 +1,4 @@
+"use strict"
 import { Router } from "./lib/my_framework/router.js";
 import { PAGES } from "./pages/routes.js";
 import { NotFound } from "./components/notFound.js";

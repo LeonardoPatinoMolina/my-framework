@@ -1,3 +1,4 @@
+"use strict"
 import { Component } from "./component.js";
 import { MyDOM } from "./myDOM.js";
 
@@ -7,19 +8,22 @@ export class Router {
    */
   static instanceRouter;
 
+  /**
+   * @type {string}
+   */
   currentPath;
   /**
-   * @type {{[string]: Component}}
+   * @type {Object<string, typeof Component>}
    */
   pages;
 
   /**
-   * @type {Component}
+   * @type {typeof Component}
    */
   #notFound;
 
   /**
-   * @param {pages: {[string]: Component}, notFound: Component} args 
+   * @param {{pages: Object.<string, typeof Component>, notFound: typeof Component}} args 
    */
   constructor(args){
     if(!!Router.instanceRouter){
@@ -40,7 +44,7 @@ export class Router {
   #renderRoute(){
     const path = window.location.pathname;
     /**
-     *@type {Component}
+     *@type {typeof Component}
      */
     const component = this.pages[path] || this.#notFound; 
     
@@ -50,12 +54,18 @@ export class Router {
     this.currentPath = path;
   }
 
+  /**
+   * 
+   * @param {string} path 
+   * @returns 
+   */
   go(path){
     if(!Object.entries(this.pages).flat().includes(path)) return;
     window.history.pushState({}, path, window.location.origin + path);
 
     const page = new this.pages[this.currentPath]()
-    page.emitter.emit(`${page.key}-EVENT`);
+    page.clear();
+    MyDOM.clearDOM();
     this.#renderRoute();
   }
 }

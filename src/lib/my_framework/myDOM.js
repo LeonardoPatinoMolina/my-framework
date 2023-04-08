@@ -2,6 +2,9 @@
 import { Component } from "./component.js";
 
 export class MyDOM {
+  /**
+   * @type {MyDOM}
+   */
   static MyDOMtInstancia;
   /** miembros del dom
    * @type {Set<string>}
@@ -13,15 +16,12 @@ export class MyDOM {
    */
   nodes = new Set();
   /** raíz del dom
-   * @type {HTMLElement}
+   * @type {HTMLElement | Element}
    */
   root;
-
-  /**
-   * 
-   * @param {HTMLElement} root 
-   * @returns {MyDOM}
-   */
+/**
+ * @param {HTMLElement | Element=} root 
+ */
   constructor(root){
     if(!!MyDOM.MyDOMtInstancia){
       return MyDOM.MyDOMtInstancia;

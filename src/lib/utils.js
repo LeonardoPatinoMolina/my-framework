@@ -5,14 +5,14 @@
 export const $ = (selector) => document.querySelector(selector);
 /**
  * @param {string} selector
- * @returns {HTMLElement[]}
+ * @returns {NodeList}
  */
 export const $$ = (selector) => document.querySelectorAll(selector);
 
 /**
  * Transforma un texto plano en nodos html
  * @param {string} str
- * @returns {HTMLElement}
+ * @returns {Element}
  */
 export const string2html = (str) => {
   let parser = new DOMParser();
@@ -82,21 +82,27 @@ export const fetchCacheInterceptor = async (urlResponse, {cacheName, revalidate}
 export const dbReady = async (name, storeName)=>{
   return new Promise((resolve, reject)=>{
     const indxDB = window.indexedDB
-    if(!indxDB) reject(new Exception('no hay indexedDB'))
+    if(!indxDB) reject(new Error('no hay indexedDB'))
     
     /**
-     * @type {IDBDatabase}
+     * @type {IDBOpenDBRequest}
      */
     const request = indxDB.open(name, 1)
     request.onerror = (err)=>{
-      reject(new Exception(`error al abrir base de datos: ${err}`))
+      reject(new Error(`error al abrir base de datos: ${err}`))
     }
     request.onsuccess = ()=>{
       console.log('base de datos abierta');
       resolve(request.result);
     }
+
+    /**
+     * 
+     * @type {(event: IDBVersionChangeEvent)=>void} 
+     */
     request.onupgradeneeded = ({target})=>{
       console.log('base de datos creada');
+      //@ts-ignore
       target.result.createObjectStore([storeName]);
     }
   })
@@ -133,7 +139,7 @@ export const fetchPersistenceInterceptor = async (urlResponse, {storeName, reval
    * Transaccion de consulta de registro en la base de datos en función a una key
    * @param {IDBDatabase} db 
    * @param {string} key 
-   * @returns {any}
+   * @returns {Promise<any>}
    */
   const dbTransactionGet = async (db, key) =>{
     return new Promise((resolve, reject)=>{
@@ -157,7 +163,7 @@ export const fetchPersistenceInterceptor = async (urlResponse, {storeName, reval
    * @param {IDBDatabase} db 
    * @param {any} data 
    * @param {string} key 
-   * @returns {any}
+   * @returns {Promise<any>}
    */
   const dbTransactionPut = async (db, data, key) =>{
     return new Promise((resolve, reject)=>{
@@ -178,7 +184,7 @@ export const fetchPersistenceInterceptor = async (urlResponse, {storeName, reval
   }
 
     const db = await dbReady('my_movies', storeName);
-      const resultGet = await dbTransactionGet(db, urlResponse);
+    const resultGet = await dbTransactionGet(db, urlResponse);
     
   if(!resultGet || isOutTime){
     window.localStorage

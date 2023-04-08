@@ -21,14 +21,14 @@ export class Component {
 
   /** espacio de memoria dedicado a almacenar el estado previo del 
    * componente para veirificaciones de reactividad
-   * @type {{[string]:any}}
+   * @type {{}}
    */
   #previusState;
 
   /** Propiedades del componente dispuestas a su uso
    * representan los datos del estado del componente al tener
    * la capacidad de persistir
-   * @type {{[string]: any}}
+   * @type {any}
    */
   props;
 
@@ -39,18 +39,18 @@ export class Component {
   $;
 
   /** Nodo HTML al que corresponde el presente componente
-   * @type {HTMLElement}
+   * @type {Element}
    */
   body;
 
   /** Componentes hijos acoplados al componente
    * actual
-   * @type {Component[]}
+   * @type {Array<Component>}
    */
   childrenAttached = [];
 
   /**
-   * @param {{key: string, props?: {[string]:any}}} args 
+   * @param {{key: string, props?: {}}=} args 
    */
   constructor(args) {
     this.key = args.key;
@@ -77,15 +77,14 @@ export class Component {
   //STATIC METHODS-------------------
   /**
    * 
-   * @param {Component} ClassComponent 
+   * @param {function(new:Component, {})} ClassComponent 
    * @param {Component} parent 
-   * @param {Array<{[string]: any}>} dataBuilder 
+   * @param {Array<{}>} dataBuilder 
    */
   static attachMany(ClassComponent, parent, dataBuilder){
     let rootsString = '';
     dataBuilder.forEach((args)=>{
       const newComponent = new ClassComponent(args);
-      
       if(!parent.childrenAttached.includes(newComponent)){
         parent.childrenAttached.push(newComponent);
       }
@@ -110,7 +109,7 @@ export class Component {
   /**
    * función encargada de ejecutar lógica previa a la 
    * construcción de la plantilla
-   * @param {{[string]: any}} props
+   * @param {{}} props
    * @returns {string}
    */
   build(props){
@@ -182,16 +181,16 @@ export class Component {
       parent.childrenAttached.push(this);
     }
     this.parent = parent;
-    // parent.emitter.on(`${parent.key}-EVENT`, this);
     return `<div class="root-component-${this.key}"></div>`;
   }//end attach
 
   /**
    * Método encargado de actualizar un componente que lo requiera,
    * es decir, un componente mutable
-   * @param {()=>void} callback 
+   * @param {(()=>void) | boolean} callback 
   */
  update(callback = false) {
+  //@ts-ignore
    if(callback) callback();
    
    const compare =JSON.stringify(this.props) === JSON.stringify(this.#previusState);
@@ -216,7 +215,7 @@ export class Component {
 
   /** ENcargada de renderizar el componente en
    * la raiz que se estipule
-   * @param {HTMLElement} root
+   * @param {HTMLElement | Element} root
    */
   render(root, principal = true){
     if(!root) {
@@ -247,6 +246,21 @@ export class Component {
    */
   removeChild(child){
     this.childrenAttached = this.childrenAttached.filter(c=> c !== child);
+  }
+
+  /**
+   * Método que limpiar cada registro del componente y de sus hijos, se espera que este método
+   * sea empleado al momento de cambiar de página en el enrutador.
+   */
+  clear(){
+    this.#didUnmount();
+    this.body = undefined;
+    this.#key = undefined;
+    this.parent = undefined;
+    this.props = undefined;
+    this.#initialized = false;
+    this.childrenAttached.forEach(child=>child.clear())
+    this.childrenAttached = [];
   }
 }
 

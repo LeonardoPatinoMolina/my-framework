@@ -1,0 +1,11 @@
+//pequeña configuración auxiliar para contar con el linter de ts 
+//en el desarrollo del presente proyecto
+{
+  "compilerOptions": {
+    "checkJs": true,
+    "noEmit": true,
+    "allowJs": true,
+    "target": "ES6",
+    "lib":["es2019", "dom"]
+  }
+}
