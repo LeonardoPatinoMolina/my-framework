@@ -2,9 +2,6 @@
 import { Component } from "../lib/my_framework/component.js";
 
 export class Card extends Component{
-  constructor(props){
-    super(props)
-  }
   
   build({name, email, user}){
     return super.template(`

@@ -1,6 +1,6 @@
 "use strict"
 import { string2html } from "../utils.js";
-import { LifeComponent } from "./lifeComponent.js";
+import { Life } from "./lifeComponent.js";
 import { MyDOM } from "./myDOM.js";
 
 /**
@@ -12,58 +12,51 @@ export class Component {
    * @type {boolean}
    */
   #initialized;
-  /**
+
+  /** valor único que desitingue al component dentro del virtual DOM
+   * de los demaás componentes
    * @type {string}
    */
   #key;
 
-  /**
+  /** espacio de memoria dedicado a almacenar el estado previo del 
+   * componente para veirificaciones de reactividad
    * @type {{[string]:any}}
    */
   #previusState;
-  /**
+
+  /** Propiedades del componente dispuestas a su uso
+   * representan los datos del estado del componente al tener
+   * la capacidad de persistir
    * @type {{[string]: any}}
    */
   props;
-  /** Nodo al que corresponde el presente componente
+
+  /** Atributo encargado de subscribir lógica al ciclo de
+   * vida del componente
+   * @type {Life}
+   */
+  $;
+
+  /** Nodo HTML al que corresponde el presente componente
    * @type {HTMLElement}
    */
-  #bodyFragment = new DocumentFragment();
-  /** Nodo al que corresponde el presente componente
-   * @type {HTMLElement}
-   */
-  body = document.createElement("div");
+  body;
 
-  /** controlador de ciclo de vida de componente
-   * @type {LifeComponent}
-   */
-  life;
-  
-  /** Función encargada de ejecutarse al demontar el 
-   * componente
-   * @type {Array<()=>void>} args
-   */
-  _disposing = [];
-  /** Función encargada de ejecutarse al demontar el 
-   * componente
-   * @type {Array<()=>void>} args
-   */
-  _updating = [];
-
-  /**
+  /** Componentes hijos acoplados al componente
+   * actual
    * @type {Component[]}
    */
   childrenAttached = [];
 
   /**
-   * 
-   * @param {{key: string, props?: {[string]:anu}}} args 
+   * @param {{key: string, props?: {[string]:any}}} args 
    */
   constructor(args) {
     this.key = args.key;
     this.props = args?.props;
     this.#previusState = this.props ? structuredClone(this.props) : undefined;
-    this.life = new LifeComponent(this);
+    this.$ = new Life(this);
     this.init();
     this.#create();
     if(!MyDOM.setMember(this)) {
@@ -130,27 +123,27 @@ export class Component {
     try {
       if(!this.#initialized) {
         this.ready();
+        this.$.initialize();
         this.#initialized = true;
       }
-    } catch (error) {}
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   /**
    * Método especializado se ejecuta al des-renderizar el componente
   */
  #didUnmount(){
+  console.log('unm', this.key);
     if(!this.#initialized) return;
-    if(this._disposing.length > 0) {
-      this._disposing.forEach(d=>d());
-      this._disposing = [];
-      this._updating = [];
-    }
+    this.$.dispose();
   }
   /**
    * Método especializado se ejecuta al des-renderizar el componente
   */
  #didUpdate(){
-    this.life.update();
+    this.$.update();
   }
 
   /**
@@ -162,7 +155,6 @@ export class Component {
     //convertimos el template a un nodo del DOM
     const componentNode = string2html(this.build(this.props));
     this.body = componentNode;
-    this.#bodyFragment.appendChild(this.body);
     
     if(!wait)this.#didMount();
     return this;
@@ -198,11 +190,15 @@ export class Component {
    * Método encargado de actualizar un componente que lo requiera,
    * es decir, un componente mutable
    * @param {()=>void} callback 
-   */
-  update(callback = false) {
-    if(callback) callback();
-
-    if(this.props === this.#previusState) return;
+  */
+ update(callback = false) {
+   if(callback) callback();
+   
+   const compare =JSON.stringify(this.props) === JSON.stringify(this.#previusState);
+   
+   if(compare) return;
+   this.#didUnmount();
+    
     const previusBody = this.body;
 
     this.#create(true);

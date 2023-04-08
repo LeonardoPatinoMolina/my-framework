@@ -3,11 +3,8 @@ import { Component } from "../lib/my_framework/component.js";
 // import { Card } from "../components/card.js";
 // import { fetchCacheInterceptor } from "../lib/utils.js";
 import { Header } from "../components/header.js";
-import { MyDOM } from "../lib/my_framework/myDOM.js";
 
 export class Home extends Component{
-  static name = 'app'
-  
   constructor(){
     super({
       props:{
@@ -18,22 +15,33 @@ export class Home extends Component{
     });
   }
 
+  init(){
+  }
   ready(){
-    this.life.$(()=>{
+    this.props.hola = 'parangana'  
+    this.$.effect(()=>{
       this.body.addEventListener('click',()=>{
-        // new Router().go('/header')
-        this.props.isReady = !this.props.isReady;
+        this.props.isReady = !this.props.isReady
         this.update();
-        // MyDOM.removeMember(this)
-      })
-    })//end life
+      })//end eventlistener
+      
+      console.log('reaccion');
+      return ()=>{
+        this.body.removeEventListener('click',()=>{
+          this.props.isReady = !this.props.isReady
+          this.update();
+        })//end eventlistener
+      }
+    })
+
   }//end init
 
-  build({title, isReady, data}){
+  build({title, isReady, hola}){
 
     return super.template(`
-    <main id="main">
+    <main id="main" style="background:red;">
       ${title}
+      ${hola}
       <br/>
       ${isReady && new Header({key: '0101'}).attach(this)}
     </main>

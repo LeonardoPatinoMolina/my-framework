@@ -1,7 +1,8 @@
 import { Component } from "../lib/my_framework/component.js";
 
 export class NotFound extends Component{
-  template(){
+  
+  build(){
     return super.template(`
       <main>
         <h1>404</h1>
