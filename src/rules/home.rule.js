@@ -8,7 +8,7 @@ import { Router } from "../lib/my_framework/router.js";
  */
 export const RuleHome = (owner)=>{
   owner.$.effect(()=>{
-    console.log(owner.gloProps[0]);
+    console.log(owner.gloProps);
     owner.body.querySelector('.link').addEventListener('click',()=>{
       // new Router().go('/header')
       setUser(64)
@@ -30,7 +30,6 @@ export const RuleHome = (owner)=>{
           owner.props.isReady = !owner.props.isReady
         });
       })//end 2
-
     }
   })
 }

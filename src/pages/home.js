@@ -23,10 +23,10 @@ export class Home extends Component{
     RuleHome(this);
   }//end init
 
-  build({title, isReady, hola},props){
+  build({title, isReady, hola}){
 
     return super.template(`
-    <main style="background:red;">
+    <main>
       ${title}
       <button class="link">Header</button>
       <button class="r">open</button>

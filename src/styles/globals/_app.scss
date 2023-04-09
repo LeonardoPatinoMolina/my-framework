@@ -39,34 +39,10 @@ button{
   border: unset;
 }
 
-.btn_noumorfus{
-  @include m.mix-flex-aligment(space-evenly);
-  color: #0008;
-  gap: 5px;
-  backdrop-filter: saturate(150%);
-  user-select: none;
-  cursor: pointer;
-  box-shadow: 
-    // 0 0 20px 0 #fff6,
-    0 20px 10px 0 #32325d40;
-  // text-shadow:0 0 6px #0006;
-  border-radius: 10px;
-  transition: box-shadow .2s, transform .2s;
-  padding: .7rem;
-  
-  &:hover{
-    transform: translateY(6px);
-    background-color: darken(#f4ffe360, 10%);
-    box-shadow: 
-      // 0 0 20px 0 #fff6,
-      0 10px 10px 0 #32325d40;
-  }
-
-  &>*{
-    filter: drop-shadow(0 0 6px #0006);
-  }
-}//end btn
-
 .none-display{
   display: none;
+}
+
+main{
+  background-color: red;
 }
