@@ -1,5 +1,4 @@
 "use strict"
-import { MyGlobalStore } from "./GlobalStore.js";
 import { Component } from "./component.js";
 
 export class MyDOM {
@@ -13,9 +12,9 @@ export class MyDOM {
   members = new Set();
 
   /**
-   * @type {Set<Component>}
+   * @type {Map<string, Component>}
    */
-  nodes = new Set();
+  nodes = new Map();
   /** raíz del dom
    * @type {HTMLElement | Element}
    */
@@ -57,7 +56,7 @@ export class MyDOM {
     const dom = new MyDOM();
     if(dom.members.has(newMember.key)) return false;
     dom.members.add(newMember.key);
-    dom.nodes.add(newMember)
+    dom.nodes.set(newMember.key, newMember)
     return true;
   }
 
@@ -68,9 +67,9 @@ export class MyDOM {
   static removeMember(targetMember){
     const dom = new MyDOM();
     if(!dom.members.has(targetMember.key)) return false;
-    dom.members.delete(targetMember.key);
-    dom.nodes.delete(targetMember);
-    return true;
+    const res1 = dom.members.delete(targetMember.key);
+    const res2 = dom.nodes.delete(targetMember.key);
+    return res1 && res2;
   }
   /**
    * 
@@ -78,9 +77,20 @@ export class MyDOM {
    */
   static memberCompare(member){
     const dom = new MyDOM();
-    return dom.nodes.has(member);
+    return dom.nodes.has(member.key);
   }
 
+  /**
+  * Encargado de remover de MyDOM que no se encuentren
+  * resnderizados, esto con  la finalidad de liberar memoria.
+  * @param {Component} target
+  */
+  static async cleanTree(target){
+    console.log(target.isRendered, target.key);
+     target.childrenAttached.forEach(c=>MyDOM.cleanTree(c));
+     if(target.isRendered) return;
+     MyDOM.removeMember(target)
+   }//end remove child
   static clearDOM(){
     const dom = new MyDOM();
     dom.members.clear()

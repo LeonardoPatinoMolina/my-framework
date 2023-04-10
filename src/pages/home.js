@@ -1,37 +1,51 @@
 import { Component } from "../lib/my_framework/component.js";
-import { RuleHome } from "../rules/home.rule.js";
 import { Header } from "../components/header.js";
-import { setUser } from "../context/feature/user.js";
 import { MyGlobalStore } from "../lib/my_framework/GlobalStore.js";
 
 export class Home extends Component{
   constructor(){
-    super({
+    super('home-page',{
       props:{
         isReady: false,
+        data: '',
+        check: false,
         title: 'App'
       },
-      key: 'home-page',
     });
   }
 
   init(){
-    const data = MyGlobalStore.subscribe('user',this);
+    MyGlobalStore.subscribe('user',this);
   }
 
-  ready(){
-    RuleHome(this);
-  }//end init
+  // ready(){
+  //   RuleHome(this);
+  // }//end init
+  
 
-  build({title, isReady, hola}){
-
-    return super.template(`
+  build({title, isReady, user}){
+    const updater = (e)=>{
+      const v = e.target.value;
+      console.log();
+      this.update(()=>{
+        this.props.user = v;
+      });
+    }
+  
+    const submitHandler = (te)=>{
+      te.preventDefault()
+    }
+    return super.template((_)=>`
     <main>
       ${title}
-      <button class="link">Header</button>
-      <button class="r">open</button>
+      <button ${_.on('click',()=>{this.update(()=>{this.props.isReady = !isReady})})}>open</button>
       <br/>
       ${isReady && new Header().attach(this)}
+
+      <form ${_.on('submit',submitHandler)}>
+        <input type="text" ${_.inputController(updater)} value="${user}">
+        <input type="submit">
+      </form>
     </main>
     `);
   }
