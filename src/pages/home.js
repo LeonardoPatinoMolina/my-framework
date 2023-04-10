@@ -6,9 +6,6 @@ export class Home extends Component{
   constructor(){
     super('home-page',{
       props:{
-        isReady: false,
-        data: '',
-        check: false,
         title: 'App'
       },
     });
@@ -16,6 +13,9 @@ export class Home extends Component{
 
   init(){
     MyGlobalStore.subscribe('user',this);
+
+    this.state = {isReady: false, user: ''};
+
   }
 
   // ready(){
@@ -23,27 +23,27 @@ export class Home extends Component{
   // }//end init
   
 
-  build({title, isReady, user}){
+  build({title}){
     const updater = (e)=>{
       const v = e.target.value;
-      console.log();
       this.update(()=>{
-        this.props.user = v;
+        this.state.user = v;
       });
     }
   
     const submitHandler = (te)=>{
       te.preventDefault()
+      console.log(te);
     }
     return super.template((_)=>`
     <main>
       ${title}
-      <button ${_.on('click',()=>{this.update(()=>{this.props.isReady = !isReady})})}>open</button>
+      <button ${_.on('click',()=>{this.update(()=>{this.state.isReady = !this.state.isReady})})}>open</button>
       <br/>
-      ${isReady && new Header().attach(this)}
+      ${this.state.isReady && new Header().attach(this)}
 
       <form ${_.on('submit',submitHandler)}>
-        <input type="text" ${_.inputController(updater)} value="${user}">
+        <input type="text" ${_.inputController(updater)} value="${this.state.user}">
         <input type="submit">
       </form>
     </main>

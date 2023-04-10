@@ -6,10 +6,15 @@ export class Header extends Component{
   constructor(){
     super('header-page',{
       props: {
-        dato: '',
         name: ''
       }
     })
+  }
+
+  init(){
+    this.state = {
+      name: ''
+    }
   }
 
   build(props){
@@ -19,11 +24,10 @@ export class Header extends Component{
       <header >${title}
       <input type="text" ${_.inputController((e)=>{
         this.update(()=>{
-          this.props.dato = e.target.value;
-          this.props.name = e.target.value;
+          this.state.name = e.target.value;
         });
-      })} value="${props.dato}">
-      ${new Card('card',{props: {name: props.name,email: 'adios@ss', user: 'usuario'}}).attach(this)}
+      })} value="${this.state.name}">
+      ${new Card('card',{props: {name: this.state.name, email: 'adios@ss', user: 'usuario'}}).attach(this)}
       </header>sd
     `)
   }

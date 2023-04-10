@@ -10,6 +10,11 @@ export class MyDOM {
    * @type {Set<string>}
    */
   members = new Set();
+  /** estructura de datos que almacena las key de los componentes
+   * hijos indexados por la key del componente padre
+   * @type {Map<string, Set<string>>}
+   */
+  family = new Map();
 
   /**
    * @type {Map<string, Component>}
@@ -19,6 +24,7 @@ export class MyDOM {
    * @type {HTMLElement | Element}
    */
   root;
+
 /**
  * @param {HTMLElement | Element=} root 
  */
@@ -41,6 +47,7 @@ export class MyDOM {
       }
     }
   }//end createRoot
+
   /**
    * 
    * @param {()=>void} store 
@@ -48,17 +55,72 @@ export class MyDOM {
   static setGlobalStore(store){
     store();
   }
+
   /**
-   * @param {Component} newMember
-   * @returns {boolean}
+   * Obtiene un componente almacenado en los nodos del
+   * arbol
+   * @param {string} key 
+   * @returns {Component}
    */
-  static setMember(newMember){
-    const dom = new MyDOM();
-    if(dom.members.has(newMember.key)) return false;
-    dom.members.add(newMember.key);
-    dom.nodes.set(newMember.key, newMember)
-    return true;
+  static getMember(key){
+    return new MyDOM().nodes.get(key)
   }
+
+  /** Inicialza una familia en el arbol
+   * @param {Component} parent
+   */
+  static initFamily(parent){
+    const family = new MyDOM().family.set(parent.key, new Set());
+    return  family.get(parent.key)
+  }
+  /** Verifica si el compnente con la key pertenece
+   * a la familia del comonente padre, es decir si es su hijo
+   * @param {Component} parent
+   * @param {string} key
+   */
+  static isInFamily(parent, key){
+    let family = MyDOM.getFamily(parent);
+    return family.has(key);
+  }
+  /**
+   * Añade un nuevo hijo al atributo family del arbol
+   * @param {Component} parent 
+   * @param {Component} child 
+  */
+ static setChild(parent, child){
+   let family = MyDOM.getFamily(parent);
+   family.add(child.key);
+  }
+  
+  /**
+   * Remueve un hijo al atributo family del arbol
+   * @param {Component} parent 
+   * @param {Component} child 
+   */
+  static removeChild(parent, child){
+    const family = new MyDOM().family.get(parent.key);
+    family.delete(child.key);
+  }
+
+  /**
+   * Obtiene un Set con todos los hijos del actual componente
+   * @param {Component} parent 
+   */
+  static getFamily(parent){
+    return new MyDOM().family.get(parent.key)
+  }
+
+    /** Añade un nuevo nodo al arbol
+   * @param {Component} newMember
+   * @returns {boolean} retorna true si se ñadió de forma adecuada
+   * y false si no se añadíó correctamente
+   */
+    static setMember(newMember){
+      const dom = new MyDOM();
+      if(MyDOM.memberCompare(newMember)) return false;
+      dom.nodes.set(newMember.key, newMember)
+      return true;
+    }
 
   /**
    * @param {Component} targetMember 
@@ -66,32 +128,21 @@ export class MyDOM {
    */
   static removeMember(targetMember){
     const dom = new MyDOM();
-    if(!dom.members.has(targetMember.key)) return false;
-    const res1 = dom.members.delete(targetMember.key);
-    const res2 = dom.nodes.delete(targetMember.key);
-    return res1 && res2;
+    if(!dom.nodes.has(targetMember.key)) return false;
+    dom.family.delete(targetMember.key);
+    return  dom.nodes.delete(targetMember.key);
   }
   /**
-   * 
+   * Verifica si el actual componente existe como 
+   * miembro del árbol
    * @param {Component} member 
    */
   static memberCompare(member){
     const dom = new MyDOM();
-    return dom.nodes.has(member.key);
+    return  dom.nodes.has(member.key);
   }
-
-  /**
-  * Encargado de remover de MyDOM que no se encuentren
-  * resnderizados, esto con  la finalidad de liberar memoria.
-  * @param {Component} target
-  */
-  static async cleanTree(target){
-    console.log(target.isRendered, target.key);
-     target.childrenAttached.forEach(c=>MyDOM.cleanTree(c));
-     if(target.isRendered) return;
-     MyDOM.removeMember(target)
-   }//end remove child
-  static clearDOM(){
+  
+   static clearDOM(){
     const dom = new MyDOM();
     dom.members.clear()
     dom.nodes.clear();

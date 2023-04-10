@@ -57,6 +57,12 @@ export class Component {
    * @type {any}
    */
   props;
+  /** Propiedades del componente dispuestas a su uso
+   * representan los datos del estado del componente al tener
+   * la capacidad de persistir
+   * @type {any}
+   */
+  state;
   /** Propiedades globales a las cualesl el componente se
    * encuentra subscrito, en esecnai se trata del estado global
    * de la app
@@ -70,48 +76,46 @@ export class Component {
    */
   $;
 
+
   /** Nodo HTML al que corresponde el presente componente
    * @type {Element}
    */
   body;
 
-  /** Componentes hijos acoplados al componente
-   * actual
-   * @type {Map<string, Component>}
+  // /** Componentes hijos acoplados al componente
+  //  * actual
+  //  * @type {Map<string, Component>}
+  //  */
+  // childrenAttached = new Map();
+  
+  /**
+   * @type {Component}
    */
-  childrenAttached = new Map();
-
+  parent;
   /**
    * @param {string} key 
-   * @param {{props?: {}}=} args 
+   * @param {{props?: any}=} args 
    */
   constructor(key, args) {
     this.key = key;
     this.props = args?.props;
-    this.#previusState = this.props ? structuredClone(this.props) : undefined;
+
+    if(MyDOM.memberCompare(this)){
+      const comp = MyDOM.getMember(this.key);
+      comp.props = args?.props;
+      comp.#create();
+      comp.#didMount();
+      return comp
+    }
+  
     this.$ = new Life(this);
     this.init();
-    this.#create();
-
-    if(!MyDOM.setMember(this)) {
-      if(new MyDOM().members.has(this.#key)){
-        const comp = new MyDOM().nodes.get(this.#key)
-        if(JSON.stringify(comp?.props) === JSON.stringify(args?.props)){
-          console.log(`00000, ${comp.key}`);
-          comp.#didMount()
-            return comp
-        }else{
-          this.parent = comp.parent;
-          comp.parent?.childrenAttached.delete(this.key);
-          comp.parent?.childrenAttached.set(this.key, this);
-          MyDOM.removeMember(this);
-        }
-      }
-    };
+    MyDOM.initFamily(this);
     MyDOM.setMember(this);
+    this.#create();
     this.#didMount();
-
   }//end constructor
+
   //GETTERS------------------
   get key(){
     return this.#key;
@@ -142,8 +146,8 @@ export class Component {
     let rootsString = '';
     dataBuilder.forEach((args)=>{
       const newComponent = new ClassComponent(args);
-      if(!parent.childrenAttached.has(newComponent.key)){
-        parent.childrenAttached.set(newComponent.key, newComponent);
+      if(!MyDOM.isInFamily(parent, newComponent.key)){
+        MyDOM.setChild(parent, newComponent);
       }
 
       newComponent.parent = parent;
@@ -182,7 +186,6 @@ export class Component {
   async #didMount(){
     try {
       if(!this.#initialized) {
-        // console.log(this.key);
         this.ready();
         this.#addEvents();
         this.#addController();
@@ -196,27 +199,36 @@ export class Component {
 
   /**
    * Método especializado se ejecuta al des-renderizar el componente
+   * @param {boolean=} isUpdating
+   * 
   */
-  async #didUnmount(){
+  async #didUnmount(isUpdating = false){
+
     if(!this.#initialized) return;
-    
     this.$.dispose();
     this.#removeEvents();
     this.#removeController();
-    // this.childrenAttached.forEach((c)=>{
-    //   c.#didUnmount();
-    // });
-    // this.removeGrandChild();
+    this.#rendered = false;
+
+    MyDOM.getFamily(this).forEach(childKey=>{
+      const child = MyDOM.getMember(childKey)
+      child.#didUnmount();
+    })//end foreach
+
+
   }//end didUnmount
 
   /**
    * Método especializado se ejecuta al des-renderizar el componente
   */
- #didUpdate(){
-  // console.log(this.key);
+ async #didUpdate(){
     this.$.update();
     this.#addEvents();
     this.#addController();
+    MyDOM.getFamily(this).forEach(childKey=>{
+      const child = MyDOM.getMember(childKey)
+      child.#didUpdate();
+    })//end foreach
   }//end didUpdate
 
   /**
@@ -227,7 +239,6 @@ export class Component {
   #create(wait = false) {
     //convertimos el template a un nodo del DOM
     const componentNode = string2html(this.build(this.props, this.gloProps));
-    // console.log(componentNode);
     this.body = componentNode;
   }//end create
 
@@ -383,8 +394,8 @@ export class Component {
    * @returns {string}
    */
   attach(parent){
-    if(!parent.childrenAttached.has(this.#key)){
-      parent.childrenAttached.set(this.#key,this);
+    if(!MyDOM.getFamily(parent).has( this.key)){
+      MyDOM.setChild(parent, this);
     }
     this.parent = parent;
     return `<div class="root-component-${this.key}"></div>`;
@@ -399,54 +410,58 @@ export class Component {
  update(callback, isGlobalChange) {
    if(callback) callback();
    
-   const compare =JSON.stringify(this.props) === JSON.stringify(this.#previusState);
+   const compare = JSON.stringify(this.state) === JSON.stringify(this.#previusState);
 
    if(compare && !isGlobalChange) return;
    this.#didUnmount();
     const previusBody = this.body;
     this.#create(true);
+
     
     const fr = new DocumentFragment();
     fr.appendChild(this.body);
-    // console.log(this.body);
 
-    this.childrenAttached.forEach((child)=>{
+    MyDOM.getFamily(this).forEach(childKey=>{
+      const child = MyDOM.getMember(childKey)
       const root = fr.querySelector(`.root-component-${child.key}`)
       child.render(root, false)
-    })
+    });
 
     previusBody.replaceWith(fr);
 
     //establecemos el estado actual como previo en 
     //espera de una proxima comparación
-    this.#previusState.local = this.props ? structuredClone(this.props) : undefined;
+    this.#previusState = this.state ? structuredClone(this.state) : undefined;
     this.#didUpdate();
   }//end update
 
-  /** ENcargada de renderizar el componente en
+  /** Encargada de renderizar el componente en
    * la raiz que se estipule
    * @param {HTMLElement | Element} root
    */
   render(root, principal = true){
     if(!root) {
-      console.log(this.key);
       /**
        * si la raíz no existe significa que el componente
        * ha sido desrenderizado
        */
-      this.parent.childrenAttached.delete(this.key);
       MyDOM.removeMember(this);
-      this.#rendered = false;
+      MyDOM.getFamily(this.parent).delete(this.key)
+      // MyDOM.getFamily(this).forEach(childKey=>{
+      //   const child = MyDOM.getMember(childKey)
+      //   child.#rendered = false;
+      // })//end foreach
       return;
     };
     const fragment = new DocumentFragment();
     fragment.appendChild(this.body);
 
-    this.childrenAttached.forEach((child)=>{
+    MyDOM.getFamily(this).forEach(childKey=>{
+      const child = MyDOM.getMember(childKey)
       const roott = this.body.querySelector(`.root-component-${child.key}`);
       
       child.render(roott, false)
-    });
+    })
 
 
     if(principal){
@@ -463,8 +478,15 @@ export class Component {
    * sea empleado al momento de cambiar de página en el enrutador.
    */
   async clear(){
+    MyDOM.getFamily(this).forEach(childKey=>{
+      const child = MyDOM.getMember(childKey)
+      child.clear();
+    });
+    
     this.#initialized = false;
-    this.childrenAttached.forEach(child=>child.clear());
     this.#didUnmount();
+    this.#rendered = false;
+    MyDOM.removeMember(this);
+
   }// end clear
 }
