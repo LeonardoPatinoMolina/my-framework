@@ -3,22 +3,10 @@ import { Component } from "./component.js";
 export class Life {
 
   /**definicion de tipos con fines de organización
+   * @typedef {{dispose: (()=>void)|undefined, update: (()=>void)|(()=>DisposeEvent), dependency: Dependecy, oldDependency: string}} EffectT
    * @typedef {()=>void} DisposeEvent
-   * @typedef {{event: ()=>(DisposeEvent | void), dependency: Array<any> | undefined, oldDependency: Array<any> | undefined}} UpdateEvent
+   * @typedef {any[]|undefined} Dependecy
    */
-
-  /** Eventos encargados de ejecutarse en cada actualización del
-   * owner (componente), este posee dependencias que lo reglan 
-   * a la hora de dispararse o no
-   * @type {Array<UpdateEvent>}
-   */
-  #updateEvents = [];
-  
-  /** Eventos encargados de ejecutarse una vez que el
-   * renderizado del owner (componente) finalize
-   * @type {Array<DisposeEvent>}
-   */
-  #disposeEvents = [];
 
   /** Componente poseedor de la instancia Life
    * al cual se realiza el seguimiento de su 
@@ -26,6 +14,15 @@ export class Life {
    * @type {Component}
    */
   #owner;
+
+  /**
+   * @type {boolean}
+   */
+  #isInitialized = false;
+  /**
+   *@type {Array<EffectT>}
+   */
+  #effects = [];
 
   /**
    * @param {Component} owner
@@ -39,39 +36,58 @@ export class Life {
    * @param {Array<any>=} dependency
    */
   effect(callback, dependency){
-    const prevValue = [...this.#updateEvents];
-    const newValue = {
-      event: callback,
-      dependency,
-      oldDependency: dependency ? [...dependency] : undefined
-    }
-    const compare = prevValue.some((v)=>{
-      return JSON.stringify(v)===JSON.stringify(newValue)
-    });
-    if(compare){
-      throw new Error(`$.effect redundante: Está utilizando un effect() en el componente ${this.#owner.key} con una configuración de dependencias que ya existe en otra implementación, utilice el effect que ya posee esta implementación en su lugar`)
-      // return
+    if(this.#owner.isFirstMount){
+
+      /**
+       *@type {EffectT}
+      */
+      const newValue = {
+        update: callback,
+        dispose: undefined,
+        dependency: dependency ? dependency : undefined,
+        oldDependency: dependency ? JSON.stringify(dependency) : '[]'
+      }
+      const compare = this.#effects.some((eff)=>{
+        return JSON.stringify(eff.dependency) === JSON.stringify(dependency)
+      });
+
+      if(compare){
+        throw new Error(`$.effect redundante: Está utilizando un effect() en el componente ${this.#owner.key} con una configuración de dependencias que ya existe en otra implementación, utilice el effect que ya posee esta implementación en su lugar`)
       };
-    
-    const f = [...prevValue, newValue];
-    this.#updateEvents =  f;
+        this.#effects.push(newValue);
+    }//end if
+
+
+    if(this.#isInitialized) this.updateEffect(dependency);
     return this;
   }//end $
 
   /**
    */
+  updateEffect(dependency){
+    this.#effects.forEach((eff)=>{
+      if (!this.#checkChange(eff?.dependency, dependency)) return;
+      eff?.dispose();
+      eff.update();
+      eff.dependency = dependency;
+    })//end foreach
+  }//end update
+  /**
+   */
   update(){
-    this.#updateEvents.forEach((upE)=>{
-      if (this.#checkChange(upE?.dependency, upE?.oldDependency)){
-          upE.event();
-      }//end if
+    this.#effects.forEach((eff)=>{
+      eff.update();
     })//end foreach
   }//end update
   /**
    * encargada de disparar eventos de desmontura
    */
   dispose(){
-    this.#disposeEvents.forEach(ev=>ev())
+    this.#effects.forEach(eff=>{
+      if(eff?.dispose){
+        eff.dispose();
+      }
+    })
   }//end dispose
 
   /** Encargada de evaluar si las dependencias del
@@ -81,30 +97,22 @@ export class Life {
    * @returns {boolean}
    */
   #checkChange(oldDependency, dependency){
-    if (oldDependency === undefined) return true;
-    if (oldDependency.length === 0) return false;
-    const c = dependency.some((d)=>{
-      return !oldDependency.includes(d)
-    })
-    return c;
+    if (dependency === undefined) return true;
+    if (dependency.length === 0) return false;
+
+    return JSON.stringify(dependency) !== JSON.stringify(oldDependency)
   }
 
   /**
    * Encargado de disparar los eventos de actualización al menos una vez
    */
   initialize(){
-    this.#updateEvents.forEach((upE)=>{
-      const d = upE.event();
+    this.#effects.forEach((eff)=>{
+      const d = eff.update();
       if(!!d){
-        const compare = this.#disposeEvents.some(f=>{
-          return f.toString() === d.toString()
-        })
-        if(compare) {
-          return
-        };
-        const nAr = [...this.#disposeEvents, d];
-        this.#disposeEvents = nAr;
+        eff.dispose = d;
       }
     })//end foreach
+    this.#isInitialized = true;
   }
 }//end class

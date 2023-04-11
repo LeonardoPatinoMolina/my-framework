@@ -8,7 +8,7 @@ import { MyDOM } from "./myDOM.js";
 */
 export class Component {
   /**
-   * @typedef {{name: string, callback: (e: any)=>void}} Handler
+   * @typedef {{keyEvent: string, name: string, callback: (e: any)=>void}} Handler
    * @typedef {{state: {value: string, positionStart: number, positionEnd: number, isFocus: boolean}, callback: (e: any)=>void, targetKey: string}} InputController
    */
 
@@ -31,44 +31,52 @@ export class Component {
   
   /** Manejador de eventos en línea, son aquellos escucha de eventos que
    * son declarados edirectamente en la plantilla
-   * @type {Array<Handler>}
+   * @type {Map<string, Handler>}
    */
-  #eventHandlers = [];
+  #eventHandlers = new Map();
   /** Controladores de inputs, integra una persistencia de 
    * estado y eventos de control de foco son declarados edirectamente en la plantilla
-   * @type {Array<InputController>}
+   * @type {Map<string, InputController>}
    */
-  #inputcontrollers = [];
+  #inputcontrollers = new Map();
 
   /** Variable auxiliar para evitar sobrecarga de controladores
    * y llevar el conteo de las keys
    * @type {number}
    */
-  #counterKeyController = 1;
+  #counterKeyController = 0;
+  /** Variable auxiliar para evitar sobrecarga de eventos
+   * y llevar el conteo de las keys
+   * @type {number}
+   */
+  #counterKeyEvent = 0;
   /** espacio de memoria dedicado a almacenar el estado previo del 
    * componente para veirificaciones de reactividad
    * @type {any}
    */
   #previusState;
 
-  /** Propiedades del componente dispuestas a su uso
-   * representan los datos del estado del componente al tener
-   * la capacidad de persistir
+  /** Propiedades del componente dispuestas
+   * representan los datos que son inyectados desde el constructor
    * @type {any}
    */
   props;
-  /** Propiedades del componente dispuestas a su uso
-   * representan los datos del estado del componente al tener
-   * la capacidad de persistir
+  /** Estado del componente, consiste en una serie
+   * de datos con la capacidad de persistir entre re renderizados.
    * @type {any}
    */
   state;
-  /** Propiedades globales a las cualesl el componente se
-   * encuentra subscrito, en esecnai se trata del estado global
-   * de la app
+  /** Stores de datos a las cuales se encuentra subscrito el componente,
+   * representan el estado global de la app e igualmente 
+   * cuentan con la capacidad de persistir entre re renderizados.
    * @type {any}
    */
-  gloProps;
+  #globalStore;
+
+  /**
+   * @type {boolean}
+   */
+  #firstMount = true;
 
   /** Atributo encargado de subscribir lógica al ciclo de
    * vida del componente
@@ -76,22 +84,16 @@ export class Component {
    */
   $;
 
-
   /** Nodo HTML al que corresponde el presente componente
    * @type {Element}
    */
   body;
-
-  // /** Componentes hijos acoplados al componente
-  //  * actual
-  //  * @type {Map<string, Component>}
-  //  */
-  // childrenAttached = new Map();
   
   /**
    * @type {Component}
    */
   parent;
+
   /**
    * @param {string} key 
    * @param {{props?: any}=} args 
@@ -126,12 +128,25 @@ export class Component {
   get isRendered(){
     return this.#rendered;
   }
+  get globalStore(){
+    return this.#globalStore;
+  }
+  get isFirstMount(){
+    return this.#firstMount;
+  }
+
   //SETTERS------------------
   /**
    * @param {string} k
    */
   set key(k){
     this.#key = `com-${k}`
+  }
+  /**
+   * @param {any} shelf
+   */
+  set globalStore(shelf){
+    this.#globalStore = {...this.#globalStore, ...shelf}
   }
   //STATIC METHODS-------------------
   /**
@@ -199,32 +214,32 @@ export class Component {
 
   /**
    * Método especializado se ejecuta al des-renderizar el componente
-   * @param {boolean=} isUpdating
    * 
   */
-  async #didUnmount(isUpdating = false){
-
+  async #didUnmount(){
     if(!this.#initialized) return;
-    this.$.dispose();
+    // this.$.dispose();
     this.#removeEvents();
     this.#removeController();
     this.#rendered = false;
+    this.#firstMount = false;
 
     MyDOM.getFamily(this).forEach(childKey=>{
       const child = MyDOM.getMember(childKey)
       child.#didUnmount();
     })//end foreach
-
-
   }//end didUnmount
 
   /**
    * Método especializado se ejecuta al des-renderizar el componente
   */
  async #didUpdate(){
-    this.$.update();
+  if(this.#firstMount) return;
+    // this.$.update();
+    this.ready();
     this.#addEvents();
     this.#addController();
+
     MyDOM.getFamily(this).forEach(childKey=>{
       const child = MyDOM.getMember(childKey)
       child.#didUpdate();
@@ -238,7 +253,7 @@ export class Component {
    */
   #create(wait = false) {
     //convertimos el template a un nodo del DOM
-    const componentNode = string2html(this.build(this.props, this.gloProps));
+    const componentNode = string2html(this.build(this.props));
     this.body = componentNode;
   }//end create
 
@@ -249,12 +264,13 @@ export class Component {
    * @returns {string}
    */
   #onEvent(name, callback){
-
-    const num = this.#eventHandlers.push({
-      name, callback
+    const keyEvent = `${this.key}-event-${this.#counterKeyEvent}`
+    this.#eventHandlers.set(keyEvent,{
+      keyEvent, name, callback
     });
+    this.#counterKeyEvent += 1;
     
-    return `data-event="${name}" data-keyevent="${this.key}-event-${num}"`
+    return `data-event="${name}" data-keyevent="${keyEvent}"`
   }//end onEvent
 
   /** Se eccarga de administrar los selectores necesarios para
@@ -266,7 +282,7 @@ export class Component {
     const keycontroller = `${this.key}-controller-${this.#counterKeyController}`;
 
     if(!this.isInitialized){
-      this.#inputcontrollers.push({
+      this.#inputcontrollers.set(keycontroller, {
         callback,
         state: {
           value: '', 
@@ -277,33 +293,35 @@ export class Component {
         targetKey: keycontroller
       });
     }
-
-
     this.#counterKeyController += 1;
 
     return `data-controller="input" data-keycontroller="${keycontroller}"`
   }//end onInputController
 
+  /**
+   */
   #addEvents(){
-    this.#eventHandlers.forEach((e,indx)=>{
-      const target = this.body.querySelector(`[data-keyevent="${this.key}-event-${indx + 1}"]`)
-
+    this.#eventHandlers.forEach((e)=>{
+      // console.log(this.key, this.#eventHandlers.length);
+      const target = this.body.querySelector(`[data-keyevent="${e.keyEvent}"]`)
       target.addEventListener(e.name,(evnt)=>{
         e.callback(evnt);
       });
     })//end foreach
   }//end addEvents
-  
+
   #removeEvents(){
-    this.#eventHandlers.forEach((e, indx)=>{
-      const target = this.body.querySelector(`[data-keyevent="${this.key}-event-${indx + 1}"]`)
+    this.#eventHandlers.forEach((e)=>{
+      const target = this.body.querySelector(`[data-keyevent="${e.keyEvent}"]`)
       target.removeEventListener(e.name,(evnt)=>{
         e.callback(evnt);
       });
-    })
-    this.#eventHandlers = [];
+    })//end foreach
+    this.#counterKeyEvent = 0;
   }//end removeEvents
 
+  /**
+  */  
   #addController(){
     this.#inputcontrollers.forEach((controller)=>{
       /**
@@ -358,7 +376,7 @@ export class Component {
         c.callback(e);
       });// end keyup eventlistener
     });
-    this.#counterKeyController = 1;
+    this.#counterKeyController = 0;
   }//end removeController
   /**
    * Encargado de generar la plantilla del componente
@@ -410,13 +428,13 @@ export class Component {
  update(callback, isGlobalChange) {
    if(callback) callback();
    
-   const compare = JSON.stringify(this.state) === JSON.stringify(this.#previusState);
+  //  const compare = JSON.stringify(this.state) === JSON.stringify(this.#previusState);
+  //  console.log(this.#previusState, this.state, this.key);
 
-   if(compare && !isGlobalChange) return;
+   if(isGlobalChange) return;
    this.#didUnmount();
-    const previusBody = this.body;
-    this.#create(true);
-
+   const previusBody = this.body;
+   this.#create(true);
     
     const fr = new DocumentFragment();
     fr.appendChild(this.body);
@@ -443,14 +461,12 @@ export class Component {
     if(!root) {
       /**
        * si la raíz no existe significa que el componente
-       * ha sido desrenderizado
+       * ha sido desrenderizado por ende podemos removerlo del 
+       * arbol
        */
+      MyDOM.removeFamily(this);
+      MyDOM.removeChild(this.parent, this);
       MyDOM.removeMember(this);
-      MyDOM.getFamily(this.parent).delete(this.key)
-      // MyDOM.getFamily(this).forEach(childKey=>{
-      //   const child = MyDOM.getMember(childKey)
-      //   child.#rendered = false;
-      // })//end foreach
       return;
     };
     const fragment = new DocumentFragment();
@@ -459,7 +475,6 @@ export class Component {
     MyDOM.getFamily(this).forEach(childKey=>{
       const child = MyDOM.getMember(childKey)
       const roott = this.body.querySelector(`.root-component-${child.key}`);
-      
       child.render(roott, false)
     })
 
@@ -474,19 +489,17 @@ export class Component {
   }//end render
 
   /**
-   * Método que establece que el componente y de sus hijos, se espera que este método
-   * sea empleado al momento de cambiar de página en el enrutador.
+   * Método que establece que el componente debe ser liberado de memoria
+   * se espera que este método sea empleado al momento
+   * de cambiar de página en el enrutador.
    */
   async clear(){
-    MyDOM.getFamily(this).forEach(childKey=>{
-      const child = MyDOM.getMember(childKey)
-      child.clear();
-    });
-    
     this.#initialized = false;
     this.#didUnmount();
+    this.$.dispose();
+    this.#inputcontrollers = new Map();
+    this.#eventHandlers = new Map();
     this.#rendered = false;
-    MyDOM.removeMember(this);
-
+    this.#firstMount = true;
   }// end clear
 }

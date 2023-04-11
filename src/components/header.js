@@ -21,16 +21,20 @@ export class Header extends Component{
     const title = 'Header';
     
     return super.template((_)=>`
-      <header >${title}
+      <header style="background-color: peru;" >
+      ${title}
       <input type="text" ${_.inputController((e)=>{
         this.update(()=>{
           this.state.name = e.target.value;
         });
       })} value="${this.state.name}">
-      ${new Card('card',{props: {name: this.state.name, email: 'adios@ss', user: 'usuario'}}).attach(this)}
+<div ${_.on('click',()=>{
+  console.log('header click');
+})}  >lorem</div>
+
+// ${new Card('card',{props: {name: this.state.name, email: 'adios@ss', user: 'usuario'}}).attach(this)}
       </header>sd
     `)
   }
 }
-
-// ${new Card('card',{props: {name: 'hola',email: 'adios@ss', user: 'usuario'}}).attach(this)}
+// ${new Card('card',{props: {name: this.state.name, email: 'adios@ss', user: 'usuario'}}).attach(this)}

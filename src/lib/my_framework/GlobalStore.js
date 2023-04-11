@@ -15,7 +15,7 @@ export class MyGlobalStore {
    */
   store = new Map();
   /**
-   * @type {Map<string, Array<Component>>}
+   * @type {Map<string, Set<Component>>}
    */
   observers = new Map();
 
@@ -26,7 +26,7 @@ export class MyGlobalStore {
     MyGlobalStore.globalStoreInstance = this;
   }
   /**
-   *
+   * 
    * @param {{reducers: {[x: string]: MyShelf}}} config
    */
   static configStore(config) {
@@ -37,7 +37,7 @@ export class MyGlobalStore {
   }
 
   /**
-   * 
+   * Método encargado de configurar el store principal
    * @param {string} reducer 
    */
   static dispatch(reducer) {
@@ -61,9 +61,12 @@ export class MyGlobalStore {
     const gStore = new MyGlobalStore();
     const myStore = gStore.store.get(shelfName);
     if(myStore){
-      const obs = gStore.observers.get(shelfName) ?? [];
-      gStore.observers.set(shelfName, [...obs, observer]);
-      observer.gloProps = myStore.data;
+      const obs = gStore.observers.get(shelfName);
+      if(obs){
+        obs.add(observer);
+      }else gStore.observers.set(shelfName, new Set().add(observer))
+      // gStore.observers.set(shelfName,  obs.set ;
+      observer.globalStore = {[myStore.name]: myStore.data};
       return myStore.data;
 
     }else throw new Error(`store inexistente: la store identificada con el nombre ${shelfName} no existe`);

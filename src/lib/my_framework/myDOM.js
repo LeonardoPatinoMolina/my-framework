@@ -107,7 +107,14 @@ export class MyDOM {
    * @param {Component} parent 
    */
   static getFamily(parent){
-    return new MyDOM().family.get(parent.key)
+    return new MyDOM().family.get(parent?.key)
+  }
+  /**
+   * @param {Component} parent
+   */
+  static removeFamily(parent){
+    const dom = new MyDOM();
+    return dom.family.delete(parent.key);
   }
 
     /** Añade un nuevo nodo al arbol
@@ -144,7 +151,7 @@ export class MyDOM {
   
    static clearDOM(){
     const dom = new MyDOM();
-    dom.members.clear()
     dom.nodes.clear();
+    dom.family.clear();
   }
 }

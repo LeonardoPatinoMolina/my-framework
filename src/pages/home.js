@@ -1,7 +1,7 @@
 import { Component } from "../lib/my_framework/component.js";
 import { Header } from "../components/header.js";
 import { MyGlobalStore } from "../lib/my_framework/GlobalStore.js";
-
+import { Router } from "../lib/my_framework/router.js";
 export class Home extends Component{
   constructor(){
     super('home-page',{
@@ -18,9 +18,11 @@ export class Home extends Component{
 
   }
 
-  // ready(){
-  //   RuleHome(this);
-  // }//end init
+  ready(){
+    this.$.effect(()=>{
+      console.log(this.globalStore);
+    },[])
+  }//end init
   
 
   build({title}){
@@ -40,6 +42,7 @@ export class Home extends Component{
       ${title}
       <button ${_.on('click',()=>{this.update(()=>{this.state.isReady = !this.state.isReady})})}>open</button>
       <br/>
+      <button ${_.on('click',()=>{new Router().go('/header')})}>go to header</button>
       ${this.state.isReady && new Header().attach(this)}
 
       <form ${_.on('submit',submitHandler)}>
