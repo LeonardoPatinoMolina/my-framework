@@ -5,7 +5,7 @@ import { NotFound } from "./components/notFound.js";
 import { MyDOM } from "./lib/my_framework/myDOM.js";
 import { store } from "./context/store.js";
 
-MyDOM.createRoot(document.getElementById("root"));
+const root = MyDOM.createRoot(document.getElementById("root"));
 MyDOM.setGlobalStore(store);
 
 const router = new Router({

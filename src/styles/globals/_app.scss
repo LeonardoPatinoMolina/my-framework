@@ -37,6 +37,10 @@ body{
 }
 button{
   border: unset;
+  background-color: #fff;
+  border-radius: 3px;
+  padding: 4px;
+  box-shadow: 0 0 5px 0 #0007;
 }
 
 .none-display{
@@ -44,5 +48,7 @@ button{
 }
 
 main{
-  background-color: red;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }

@@ -1,59 +1,35 @@
 import { Component } from "../lib/my_framework/component.js";
-import { Header } from "../components/header.js";
-import { MyGlobalStore } from "../lib/my_framework/GlobalStore.js";
-import { Router } from "../lib/my_framework/router.js";
-export class Home extends Component{
+
+export class Counter extends Component{
   constructor(){
-    super('home-page',{
-      props:{
-        title: 'App'
-      },
-    });
+    super('home-page');
   }
 
   init(){
-    MyGlobalStore.subscribe('user',this);
-
-    this.state = {isReady: false, user: ''};
-
+    this.state = {
+      count: 0
+    };
   }
 
-  ready(){
-    this.$.effect(()=>{
-      console.log(this.globalStore);
-    },[])
-  }//end init
-  
-
-  build({title}){
-    const updater = (e)=>{
-      const v = e.target.value;
+  build(){
+    const addCount = ()=>{
       this.update(()=>{
-        this.state.user = v;
-      });
+        this.state.count += 1;
+      })
     }
-  
-    const submitHandler = (te)=>{
-      te.preventDefault()
-      console.log(te);
-    }
+
     return super.template((_)=>`
     <main>
-      ${title}
-      <button ${_.on('click',()=>{this.update(()=>{this.state.isReady = !this.state.isReady})})}>open</button>
-      <br/>
-      <button ${_.on('click',()=>{new Router().go('/header')})}>go to header</button>
-      ${this.state.isReady && new Header().attach(this)}
-
-      <form ${_.on('submit',submitHandler)}>
-        <input type="text" ${_.inputController(updater)} value="${this.state.user}">
-        <input type="submit">
-      </form>
+      <h2>Mi Contador</h2>
+      <p>${this.state.count}</p>
+      <button ${_.on('click', addCount)}>add</button>
     </main>
     `);
   }
 }
-
+// import { Header } from "../components/header.js";
+// import { MyGlobalStore } from "../lib/my_framework/GlobalStore.js";
+// import { Router } from "../lib/my_framework/router.js";
     // fetch('https://jsonplaceholder.typicode.com/users')
     //   .then(r=>r.json())
     //   .then((res)=>{
