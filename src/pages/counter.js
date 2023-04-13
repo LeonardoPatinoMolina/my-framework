@@ -2,7 +2,7 @@ import { Component } from "../lib/my_framework/component.js";
 
 export class Counter extends Component{
   constructor(){
-    super('home-page');
+    super('counter-page');
   }
 
   init(){
@@ -27,9 +27,7 @@ export class Counter extends Component{
     `);
   }
 }
-// import { Header } from "../components/header.js";
-// import { MyGlobalStore } from "../lib/my_framework/GlobalStore.js";
-// import { Router } from "../lib/my_framework/router.js";
+
     // fetch('https://jsonplaceholder.typicode.com/users')
     //   .then(r=>r.json())
     //   .then((res)=>{

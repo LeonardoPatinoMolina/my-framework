@@ -423,19 +423,21 @@ export class Component {
    * Método encargado de actualizar un componente que lo requiera,
    * es decir, un componente mutable
    * @param {(()=>void)=} callback 
-   * @param {boolean=} isGlobalChange 
+   * @param {boolean=} forceChange
   */
- update(callback, isGlobalChange) {
+ update(callback, forceChange = false) {
    if(callback) callback();
    
-  //  const compare = JSON.stringify(this.state) === JSON.stringify(this.#previusState);
-  //  console.log(this.#previusState, this.state, this.key);
+   const compare = JSON.stringify(this.state) === JSON.stringify(this.#previusState);
+   
+   // solo actualizar el componente si el estado a cambiado
+   //o si el cambio es del estado global
+   if(compare || forceChange) return;
 
-   if(isGlobalChange) return;
    this.#didUnmount();
    const previusBody = this.body;
    this.#create(true);
-    
+   
     const fr = new DocumentFragment();
     fr.appendChild(this.body);
 

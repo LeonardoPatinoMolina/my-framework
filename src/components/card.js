@@ -1,3 +1,4 @@
+//componente de prueva
 import { Component } from "../lib/my_framework/component.js";
 import { MyDOM } from "../lib/my_framework/myDOM";
 
