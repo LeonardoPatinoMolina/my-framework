@@ -161,7 +161,7 @@ export class Component {
     let rootsString = '';
     dataBuilder.forEach((args)=>{
       const newComponent = new ClassComponent(args);
-      if(!MyDOM.isInFamily(parent, newComponent.key)){
+      if(!MyDOM.getFamily(parent).has( newComponent.key)){
         MyDOM.setChild(parent, newComponent);
       }
 

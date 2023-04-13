@@ -92,13 +92,13 @@ Ahora pasamos a los métodos, la clase Component sin contar el método contructo
 #### __Oblidatorios__
 - __attach(parent)__: método encargado de acoplar el componente al cuerpo de otro componente, estableciendo así una relación de padre e hijo, recibe como parámetro la instancia del componente padre. este método retorna un string que corresponde a su nodo raíz, esto implica que preferiblemente sea invocado dentro de la plantilla literal de su componente padre.
 - __(para sobreescritura) build(props, state, global)__: método destinado a ser sobre escrito, recibe como primer parámetro las props del componente, como segundo el estado local y como tercero el store global al cual está subscrito el componente, estos parámetros son opcionales. El propósito del método es construir la _plantilla_ del componente, esta tarea la ejecuta en conjunto con el siguiente método _template(c)_, adicionalmente es un scope para ejecutar _lógica previa_ al ensamble del nodo final del componente. debe retornar el método _template(c)_.
-- __template((_)=>``)__: método encargado de adminstrar la plantilla literal donde reza la sintaxis del nodo del componente, recive como parámetro una ```función callback``` la cual retorna la plantilla literal, esta recibe como parámetro un objeto ````controlador```` encargado de proveer funciones para definir eventos en línea y <em>manejadores de campos de formulario</em>, más adelante mostraré casos practicos de esta estructura tan peculiar, aunque ya en el ejemplo del contador se pudo ver una muestra de esta caracterísctica.
+- __template(callback)__: método encargado de adminstrar la plantilla literal donde reza la sintaxis del nodo del componente, recive como parámetro una ```función callback``` la cual retorna la plantilla literal, esta recibe como parámetro un objeto ````controlador```` encargado de proveer funciones para definir eventos en línea y <em>manejadores de campos de formulario</em>, más adelante mostraré casos practicos de esta estructura tan peculiar, aunque ya en el ejemplo del contador se pudo ver una muestra de esta caracterísctica.
 
 
 #### __Opcionales__
 - __(para sobreescritura) init()__: método destinado a ser sobre escrito, no tiene parámetros, su función es muy puntual: proveer un espacio para inicalizar el estado del componente, tanto local como global, esté metodo se ejecuta automáticamente al inicializar el componente, lo cual lo hace idóneo para esta tarea.
 - __(para sobreescritura) ready()__:  método destinado a ser sobre escrito, no tiene parámetros, este método se ejecuta automáticamente cada vés que el componente se renderiza, incluyendo los re renderizados, es decir, su función es proveer un espacio para ejecutar lógica cuando el componente se encuentra en el _DOM_, esto es útil para la lógica interesada en manipular el DOM.
-- __update(()=>{}, forceChange)__: método encargado de actualizar la vista, en otras palabras, es el equivalente a un _setState()_, pero no funciona como ``React.js``, en su lugar funciona como ``Flutter``, este verifica si el estado ha mutado, de lo contrario ignora la intención, sin embargo, este comportamiento puede modificarse. El método tiene como parámetros una función ``callback`` donde podremos alterar el estado con la seguridad de que el método podrá enterarse, pero como este sistema es un simil de flutter, basta con invocarlo despues de cambiar el estado sin necesidad de pasarle ese callback; el segundo parámetro es un booleano que obliga al componente a re renderizarse sin verificar si el estado cambió o no, igualmente es un parametro opcional y tiene un valor por defecto de _false_.
+- __update(callback, forceChange)__: método encargado de actualizar la vista, en otras palabras, es el equivalente a un _setState()_, pero no funciona como ``React.js``, en su lugar funciona como ``Flutter``, este verifica si el estado ha mutado, de lo contrario ignora la intención, sin embargo, este comportamiento puede modificarse. El método tiene como parámetros una función ``callback`` donde podremos alterar el estado con la seguridad de que el método podrá enterarse, pero como este sistema es un simil de flutter, basta con invocarlo despues de cambiar el estado sin necesidad de pasarle ese callback; el segundo parámetro es un booleano que obliga al componente a re renderizarse sin verificar si el estado cambió o no, igualmente es un parametro opcional y tiene un valor por defecto de _false_.
 - __(estático) attachMany(ClassComponent, parent, dataBuilder)__: este método realiza la misma función que su menor ``attach()``, con la diferencia de que este es un estático y está diseñado para acoplar componentes en lote, cuenta con tres parámetros, el primero es la _clase_ (no una instancia) del componente que se desea acoplar, el segundo es la intancia del componente padre, y el tercero consiste en un una lista de objetos con la sigueinte estructura:
 
     ~~~Javascript
@@ -123,7 +123,7 @@ El ciclo de vida de un componente tiene __cuatro__  estadios o estados, estos at
     ~~~Javascript
       init(){
         
-        GLobalStore.subscribe('products',this);
+        MyGLobalStore.subscribe('products',this);
 
         this.state = {
           count: 0
@@ -172,3 +172,120 @@ El ciclo de vida de un componente tiene __cuatro__  estadios o estados, estos at
     En este ejemplo apreciamos las grandes similitudes con ``useEffect()`` de React.js, este pequeño ejemplo imprimirá en consola "adios mundo" en cada desrenderizado.
 
 ### __LifeComponent__
+La clase LifeComponent tiene como finalidad asociar lógica reactiva al ciclo de vida de componentes, de allí que esté diseñada para componer la estructura básica de un componente particular.
+
+### __Métodos__
+Esta posee cuatro métodos públicos de los cuales solo usaremos uno de ellos, ya que los otras hacen parte de la lógica interna, pero de nuevo, conviene conocerlos. clasificados son los siguientes:
+#### __De uso regular__
+- __effect(callback, dependency)__: este médoto es un análogo al hook de ``React.js``, funciona casi exactamente igual, este está destinado a ejecutarse al menos ``una véz``, ello cuando el componente ha sido _renderizado_ o _actualizado_ en base a un arreglo de dependencias, además brinda la posibilidad de asociar lógica al desrenderizado (igual que en useEffect()). Su primer parámetro es un ``callback``, este contiene la lógica que se ejecutará al menos una véz y en cada ocación que las dependecias permitan su llamada, el segundo parámetro es el arreglo de dependencias, estos son datos que serán análizados antes de ejecutar el callback, si resulta que han mutado, el callback será ejecutado. 
+veamos en el siguiente ejemplo done lo implementamos para que imprima en consola un "hola mundo" cada véz que el estado "saludo" cambie:
+
+    ~~~Javascript
+    //my framework
+    ready(){
+
+      this.$.effect(()=>{
+        console.log("hola mundo");
+      },[this.state.saludo]);
+
+    }
+    ~~~
+  para notar el gran parecido con ``React.js`` veamos esto mismo pero con sintaxis de react.js:
+
+    ~~~Javascript
+    //react
+    useEffect(()=>{
+      console.log("hola mundo");
+    },[saludo]);
+    ~~~
+
+    Aquí otro ejemplo para imprimir un Hola mundo al renderizar el componente y un adios mundo al desrenderizar una sola véz:
+
+    ~~~Javascript
+    //my framework
+    ready(){
+
+      this.$.effect(()=>{
+        console.log("hola mundo");
+
+        return ()=>{
+          console.log("adios mundo");
+        }
+      },[]);
+
+    }
+    ~~~
+
+    Ahora esto mismo en ``React.js``:
+
+    ~~~Javascript
+    //react
+    useEffect(()=>{
+      console.log("hola mundo");
+
+      return ()=>{
+        console.log("adios mundo");
+      }
+    },[]);
+    ~~~
+
+    >``Importante``: tanto el callback pricipal como el retornado solo se ejecutarán una vez, esto se debe a que ambos validan el arreglo de dependencias, si desea darle un caracter reactivo distinto a la lógica de desrenderizado (el callback retornado) debe optar por otro __effect()__ con las dependencias que le convengan.
+    
+    La diferencia que guarda el método __this.$.effect()__ de mi framwwork con __useEffect()__ de React.js es que no pueden repetirse si cuentan con las mismas dependencias, si se intenta crear otro effect() con las mismas dependecias de otro que se encuentra vigente, obtendrá una ``excepción de redundancia``, aunque el callback sea distinto, las dependecnias no pueden ser las mismas en distintos effect(). Otra diferencia algo más práctica es que este método retorna la misma instancia LifeComponent, esta característica fue pensada para conctatenar effects, ejemplo:
+    
+    ~~~Javascript
+    ready(){
+
+      this.$.effect(()=>{
+        console.log("hola mundo");
+      },[this.state.saludo])
+      .effect(()=>{
+        console.log("hola mundo 2")
+      },[])
+
+    }
+    ~~~
+
+    Lo que sucederá en este ejemplo es que la consola imprimirá:
+    ~~~ Bash
+    -% hola mundo
+    -% hola mundo 2
+    ~~~
+
+    y a partir de allí seguirá imprimiendo "hola mundo" cuando cambie el estado saludo.
+#### __De lógica interna__
+LifeComponent cataloga en dos categorías las funciones asociadas a efectos, aquellas que se ejecutan al renderizar el componente son efectos __update__, y aquellas que estan destinadas a ejecutarse cuando el componente se desrenderice son efectos __dispose__, existen métods encargados de propagarlos y son públicos, sin embargo, están asociados a la lógica interna del framework:
+
+- __update()__: método encargado de ejecutar todos los callbacks de efectos de renderizado, esto siempre y cuando se encuentren en condiciones de ser invocados, es decir, que sus dependencias lo permitan ya sea porque han mutado o porque están indefinidas.
+- __dispose()__: método encargado de ejecutar todos los callbacks de efectos de desrenderizado, esto siempre y cuando se encuentren en condiciones de ser invocados, es decir, que sus dependencias lo permitan ya sea porque han mutado o porque están indefinidas.
+- __initialize()__: este método se asegura que cada callback asociada a un efecto update se ejecute mínimo una véz. esto es necesario para poder almacenar el efecto de dispose en caso de existir. pero esta es una carácterística del framework y no require manipularse.
+
+## __MyDOM__
+A esta entidad me refiero cuando hablo de árbol de componentes, este no es un __virtual dom__, pero cumple un rol semejante, es gracias a esta entidad que esxiste un pivote, un soporte sobre el cual ensamblar la estrcutura general de todos los componentes que se encuentren en funciónes. Aspectos como sus familias, su petenencia al árbol y la raíz principal.
+### __Atributos__
+MyDOM cuenta con __cuatro__ atributos públicos, los cuales no tienen una trascendencia mayor a la lógica interna del framework, pero de igual forma conviene conocerles:
+- __family__: este atributo es un objeto __Map__ que almacena estructuras __Set__ las cuales encapsulan referencias a los componentes hijos de cada componente en funciones, es decir, que están siendo renderizados. Cada set es indexado por una cadena de texto correspondiente a la key única del componente padre.
+- __nodes__: este atributo es un objeto __Map__ que almacena las refernencias a todos los componentes que se encuentren en funciones, indexados por su propia key.
+- __root__: este atributo almacena una referencia a la raíz de la aplicación, la cual es el elemento del DOM en el cual se renderiza el árbol, un ejemplo podía ser:
+
+    ~~~Html
+    <div id="root"></div>
+    ~~~
+
+### __Métodos__
+los métodos de la entidad MyDOM son todos estáticos, cuenta con __doce__ métodos de los cuales están destinados para usarse en la lógica interna del framework, sin embargo algunos pueden ser de útilidad para el uso regular, por ello conviene conocerlos:
+
+- __clearDOM()__: método encargado de vacíar y eliminar todos los datos del árbol, este método tiene el propósito de ser empleado en el enrutador, tema que será tratado más adelante.
+- __createRoot(root)__: método encargado de asignar el elemento del dom que será la raíz del árbol de componentes, ya en el ejemplo de la entrada de la app se pudo observar su uso, este recibe como parámetro el elemento destinado a este fin.
+- __getMember(key)__: función encargadad de retornar el componente del árbol que corresponda a la ``key`` quye se recibe como prámetro.
+- __getFamily(parent)__: método que retorna la estructura ``Set`` que almacena todos los componentes hijos del componente padre que será reciido como parámetro.
+- __initFamily(parent)__: método encargado de inicializar un espacio del atributo ``family`` del árbol para un componente en caso de poseer componentes hijos. recibe como parámetro el componente padre.
+- __memberCompare(member)__: este método recibe como parámetro la instancia de un componente y realiza una validación en la que verifica si el presente componente es miembro del árbol, retorn ``true`` si esto es así, y ``false`` si no lo es.
+- __removeChild(parent, child)__: método encargado de remover un componente hijo de la familia de un componente padre, para ello recibe como parametro el componente _child_ el cual será removido y el componente __parent__ que es el padre.
+- __removeFamily(parent)__: método encargado de remover una familia entera del árbol, este método está orientado a remover familias de componentes que ya no pertenecen al árbol.
+- __setChild(parent, child)__: método encargado de añadir un nuevo hijo a la familia de un componente padre, para ello recibe como parametro el componente _child_ el cual será añadido y el componente __parent__ que es el padre de la familia.
+- __setGlobalStore(store)__: método encargado de asignar el store global al árbol de componentes, recibe como parámetro el objeto retornado por el método configStore de la clase ``MyGlobalStore`` que será tratada más adelante. 
+- __setMember(newMember)__: este método añade un nuevo miembro a los nodos del árbol, recibe como parámetro una instancia del  componente que será añadido.
+- __removeMember(targetMember)__: método encargado de remover un componente que ya es miembro de los nodos del árbol, este se reibe como parámetro. Este método es empleado por el framework para remover componentes que son desrenderizados.
+
+### __MyGlobalStore__

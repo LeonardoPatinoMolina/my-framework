@@ -58,13 +58,14 @@ export class Life {
     }//end if
 
 
-    if(this.#isInitialized) this.updateEffect(dependency);
+    if(this.#isInitialized) this.#updateEffect(dependency);
     return this;
   }//end $
 
   /**
+   * @param {any} dependency
    */
-  updateEffect(dependency){
+  #updateEffect(dependency){
     this.#effects.forEach((eff)=>{
       if (!this.#checkChange(eff?.dependency, dependency)) return;
       eff?.dispose();

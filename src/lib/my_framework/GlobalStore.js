@@ -26,7 +26,7 @@ export class MyGlobalStore {
     MyGlobalStore.globalStoreInstance = this;
   }
   /**
-   * 
+   * Establece la configuración egenral de la store global
    * @param {{reducers: {[x: string]: MyShelf}}} config
    */
   static configStore(config) {

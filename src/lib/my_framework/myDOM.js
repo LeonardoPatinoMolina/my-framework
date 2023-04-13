@@ -6,10 +6,7 @@ export class MyDOM {
    * @type {MyDOM}
    */
   static MyDOMtInstancia;
-  /** miembros del dom
-   * @type {Set<string>}
-   */
-  members = new Set();
+
   /** estructura de datos que almacena las key de los componentes
    * hijos indexados por la key del componente padre
    * @type {Map<string, Set<string>>}
@@ -35,7 +32,9 @@ export class MyDOM {
     this.root = root;
     MyDOM.MyDOMtInstancia = this;
   }
-
+  /**
+   * @param {Element} root
+   */
   static createRoot(root){
     new MyDOM(root);
     return {
@@ -49,7 +48,7 @@ export class MyDOM {
   }//end createRoot
 
   /**
-   * 
+   * Establece el store global 
    * @param {()=>void} store 
    */
   static setGlobalStore(store){
@@ -73,15 +72,7 @@ export class MyDOM {
     const family = new MyDOM().family.set(parent.key, new Set());
     return  family.get(parent.key)
   }
-  /** Verifica si el compnente con la key pertenece
-   * a la familia del comonente padre, es decir si es su hijo
-   * @param {Component} parent
-   * @param {string} key
-   */
-  static isInFamily(parent, key){
-    let family = MyDOM.getFamily(parent);
-    return family.has(key);
-  }
+
   /**
    * Añade un nuevo hijo al atributo family del arbol
    * @param {Component} parent 
@@ -109,6 +100,7 @@ export class MyDOM {
   static getFamily(parent){
     return new MyDOM().family.get(parent?.key)
   }
+
   /**
    * @param {Component} parent
    */
@@ -122,12 +114,12 @@ export class MyDOM {
    * @returns {boolean} retorna true si se ñadió de forma adecuada
    * y false si no se añadíó correctamente
    */
-    static setMember(newMember){
-      const dom = new MyDOM();
-      if(MyDOM.memberCompare(newMember)) return false;
-      dom.nodes.set(newMember.key, newMember)
-      return true;
-    }
+  static setMember(newMember){
+    const dom = new MyDOM();
+    if(MyDOM.memberCompare(newMember)) return false;
+    dom.nodes.set(newMember.key, newMember)
+    return true;
+  }
 
   /**
    * @param {Component} targetMember 
@@ -149,7 +141,7 @@ export class MyDOM {
     return  dom.nodes.has(member.key);
   }
   
-   static clearDOM(){
+  static clearDOM(){
     const dom = new MyDOM();
     dom.nodes.clear();
     dom.family.clear();
