@@ -3,7 +3,6 @@ import { Component } from "./component.js";
    * @typedef {{[x: string]: (data: any, payload: any)=>void}} Reducer
    */
 
-
 export class MyGlobalStore {
   /**
    * @type {MyGlobalStore}
@@ -37,16 +36,16 @@ export class MyGlobalStore {
   }
 
   /**
-   * Método encargado de configurar el store principal
-   * @param {string} reducer 
+   * Método encargado de despachar los eventos
+   * de actualización en base a un reducerPath
+   * @param {string} shelfName
    */
-  static dispatch(reducer) {
+  static dispatch(shelfName) {
     const gStore = new MyGlobalStore()
-    const obs = gStore.observers.get(reducer)
+    const obs = gStore.observers.get(shelfName)
     if(obs){
-      gStore.observers.get(reducer).forEach(o=>{
-        //actualizamos avisando que se trata
-        //de unu cambio global
+      gStore.observers.get(shelfName).forEach(o=>{
+        //forzamos un actualización de los observers
         o.update(()=>{}, true)
       });
     }
@@ -87,19 +86,19 @@ class MyShelf {
   /**
    * @type {{[x: string]: (payload: any)=>void}}
    */
-  #reducer;
+  #reducers;
 
   /**
-   * @param {{name: string, initialData: any, reducer: Reducer}} args
+   * @param {{name: string, initialData: any, reducers: Reducer}} args
    */
-  constructor({ name, initialData, reducer }) {
+  constructor({ name, initialData, reducers }) {
     this.#keyStore = name;
     this.#data = initialData;
 
     //generamos todos las funciones disparadoras
     //partiendo de los reducers configurados
 
-     const reducers = Object.entries(reducer).map(([k, v]) => {
+     const reducersArr = Object.entries(reducers).map(([k, v]) => {
       return{
         /**
          * @param {any} payload 
@@ -112,20 +111,20 @@ class MyShelf {
     })//end map
   
     /**
-   * @type {{[x: string]: (payload: any)=>void}}
-   */
-    let newR;
-    reducers.forEach((r)=>{
-      newR = {...newR, ...r}
+    * @type {{[x: string]: (payload: any)=>void}}
+    */
+    let newReducers;
+    reducersArr.forEach((r)=>{
+      newReducers = {...newReducers, ...r}
     })
-    this.#reducer = newR;
+    this.#reducers = newReducers;
   }
 
   get name(){
     return this.#keyStore;
   }
   get reducers(){
-    return this.#reducer;
+    return this.#reducers;
   }
   get data(){
     return this.#data
@@ -133,7 +132,7 @@ class MyShelf {
 }
 
 /**
- * @param {{name: string, initialData: any, reducer: Reducer}} args
+ * @param {{name: string, initialData: any, reducers: Reducer}} args
  * @returns {MyShelf}
  */
 export const createShelf = (args) => {

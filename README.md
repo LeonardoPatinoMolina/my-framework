@@ -261,7 +261,7 @@ LifeComponent cataloga en dos categorías las funciones asociadas a efectos, aqu
 - __initialize()__: este método se asegura que cada callback asociada a un efecto update se ejecute mínimo una véz. esto es necesario para poder almacenar el efecto de dispose en caso de existir. pero esta es una carácterística del framework y no require manipularse.
 
 ## __MyDOM__
-A esta entidad me refiero cuando hablo de árbol de componentes, este no es un __virtual dom__, pero cumple un rol semejante, es gracias a esta entidad que esxiste un pivote, un soporte sobre el cual ensamblar la estrcutura general de todos los componentes que se encuentren en funciónes. Aspectos como sus familias, su petenencia al árbol y la raíz principal.
+A esta entidad me refiero cuando hablo de árbol de componentes, consiste en una instancia única que sigue el patrón __Singleton__ pues solo debe existir uno en todo la app. Este no es un __virtual dom__, pero cumple un rol semejante, es gracias a esta entidad que esxiste un pivote, un soporte sobre el cual ensamblar la estrcutura general de todos los componentes que se encuentren en funciónes. Aspectos como sus familias, su petenencia al árbol y la raíz principal.
 ### __Atributos__
 MyDOM cuenta con __cuatro__ atributos públicos, los cuales no tienen una trascendencia mayor a la lógica interna del framework, pero de igual forma conviene conocerles:
 - __family__: este atributo es un objeto __Map__ que almacena estructuras __Set__ las cuales encapsulan referencias a los componentes hijos de cada componente en funciones, es decir, que están siendo renderizados. Cada set es indexado por una cadena de texto correspondiente a la key única del componente padre.
@@ -289,3 +289,70 @@ los métodos de la entidad MyDOM son todos estáticos, cuenta con __doce__ méto
 - __removeMember(targetMember)__: método encargado de remover un componente que ya es miembro de los nodos del árbol, este se reibe como parámetro. Este método es empleado por el framework para remover componentes que son desrenderizados.
 
 ### __MyGlobalStore__
+La administración del estado global en mi framework es llevada a cabo por la clase MyGlobalStore, esta se vale de otra clase llamada __MyShelf__ y una función auxiliar llamada __createShelf__. AL igual que la clase MyDOM es una entidad de única instancia, y engloba la estructura y lógica necesaría para proveer una serie de datos en forma de store global, este sistema sigue el ``patrón reductor`` para la asignación de funciones de mutabilidad de datos del store, y el ``patrón mediador`` para subscribir componentes reactivos al mismo, pues, efectivamente s etratad el estado global de la app.
+#### __Atributos__
+ La clase MyGlobalStore cuenta con __dos__ atributos que normalmente no tendremos que manipular:
+
+ - __store__: este atributo es un objeto __Map__ que almacena todas las store las cuales consisten en instancias de la clase ``MyShelf``, estan son indexadas por su ``reducerpath``, el cual es una cadena de texto que se declara en la clase MyShelf, cual será detallada más adelante.
+ - __observers__: este atributo es un objeto __Map__ que almacena todos los componentes que se encuentran subscritos a un store concreto.
+
+ #### __Metodos__
+ Todos los métodos de la clase MyGlobalStore son estáticos, cuenta con __tres__ métodos destinados a declarar, subscribir y despachar:
+
+ - __configStore(config)__: método encargado de configurar la store principal, este recibe como parámetro un objeto de configuración donde se asignan los reductores de cada Shelf para ser proveidos por la clase. En el ejemplo siguiente, vemos como se utiliza el método para configurar una store que distribuye un shelf de nombre ``userShelf``, con este fin recibe el objeto de configuración el cual posee un atributo ``reducers`` en el cual se asigna, a la propiedad con el nombre correspondiente de userShelf, la instancia de este Shelf, la creación de este último será tratada más adelante.
+
+    ~~~Javascript
+    "use strict"
+    import { MyGlobalStore } from "../lib/my_framework/GlobalStore.js";
+    import { userShef } from "./feature/user.js";
+
+    export const store = MyGlobalStore.configStore({
+      reducers: {
+        [userShef.name]: userShef
+      }
+    });
+    ~~~
+
+ - __subscribe(shelfName, observer)__: método encargado de subscribir un nuevo componente a un shelf concreto del store, para ello recibe como parámetro el nombre del shelf y la instancia del componente (observer), hemos podido ver un ejemplo con anterioridad, en el cual sibscribimos un componente a través del método ``init()``:
+
+     ~~~Javascript
+      init(){
+        MyGLobalStore.subscribe('products',this);
+      }
+    ~~~
+
+    con esta sintaxisi es suficiente para que el componente en cuentión reaccione a las modificaciónes del store a través del ``dispatch()``.
+
+ - __dispatch(shelfName)__: método encargado de propagar el evento de actualización de estado a todos los componentes _observers_ que esten subscritos un ``shelf`` concreto en el store, para ello recibe como parámetro el nombre del shelf en cuestión. A diferencia de los anteriores métodos, este no está destinado a usarse durante el desarrollo, en cambio hace parte de la lógica interna del administfrador de estao global del framework, por eso no tendremos que manipularle.
+
+### __MyShelf__
+clase encargada de organizar todo lo relacionado a un estado concreto del store, este es muy parecido a los slide de __Redux Toolkit__, a estas alturas queda claro que el presente proyecto (my framework) es mi cosecha de distintas tecnologías que he podido aprender durante mi tiempo de formación como analista y desarrollador de sistemas de información, y redux es una de ellas
+. para configutar un shelf contamos con una fución auxiliar, opté por este diseño porque no quería que este se convirtiera en una preocupación demaciado grande para la experiencia de desarrollo, relmente nunca estamos en contacto directo con la clase MyShelf, solo con su instancia, pero conviene conocerle:
+
+#### __Accessors / Getters__
+La clase MyShelf cuenta con __tres__ _accesors_ o _getters_ los caules tenemos a disposción:
+- __name__: consiste en el nombre del shelf, este que lo identifica y lo distinque de los demás, se espera que sea único.
+- __reducers__: consiste en un objeto que almacena las funciones encargadas de mutar el estado que almacena el shelf, es decir, los datos del store, estos está destinados a ser usados regularmente.
+- __data__: consiste en los datos almacenados en el shelf, pueden ser cualquier cosa, un objeto o un dato primitivo, al final será indexado por el nombre del shelf.
+
+#### __createShelf(config)__
+Esta es la función auxiliar a través de la cual podremos crear un shelf, podríamos decir que es un __factory__, esta retorna una instancia de la clase MyShelf, la mejor forma de detallarla es viéndola en acción.
+
+Continuando con el ejemplo anterior de la configuración del __store__ con el método de la clase MyGLobalStore, ``configStore()``, donde se empleó un shledf de nombre __userShelf__, en este veremos como se creó aquel:
+
+~~~Javascript
+"use strict"
+import { createShelf } from "../../lib/my_framework/GlobalStore.js";
+
+export const userShef = createShelf({
+  name: 'user',
+  initialData: ['homerpo', 'epa'],
+  reducers: {
+    setUser: (data, payload)=>{
+      data.push(payload);
+    }
+  }
+});
+
+export const { setUser } = userShef.reducers;
+~~~
