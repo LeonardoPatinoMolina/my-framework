@@ -10,4 +10,4 @@ export const userShef = createShelf({
   }
 });
 
-export const { setUser } = userShef.reducers;
+export const { setUserDispatch } = userShef.actions;

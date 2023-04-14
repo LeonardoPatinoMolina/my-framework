@@ -1,6 +1,7 @@
 import { Component } from "./component.js";
   /**
    * @typedef {{[x: string]: (data: any, payload: any)=>void}} Reducer
+   * @typedef {(payload: any)=>void} Action
    */
 
 export class MyGlobalStore {
@@ -65,7 +66,14 @@ export class MyGlobalStore {
         obs.add(observer);
       }else gStore.observers.set(shelfName, new Set().add(observer))
       // gStore.observers.set(shelfName,  obs.set ;
-      observer.globalStore = {[myStore.name]: myStore.data};
+      if(observer.globalStore){
+        observer.globalStore = {
+          ...observer.globalStore,
+          [myStore.name]: myStore.data
+        };
+      }else{
+        observer.globalStore = {[myStore.name]: myStore.data}
+      }
       return myStore.data;
 
     }else throw new Error(`store inexistente: la store identificada con el nombre ${shelfName} no existe`);
@@ -84,12 +92,12 @@ class MyShelf {
    */
   #data;
   /**
-   * @type {{[x: string]: (payload: any)=>void}}
+   * @type {{[x: string]: Action}}
    */
-  #reducers;
+  #actions;
 
   /**
-   * @param {{name: string, initialData: any, reducers: Reducer}} args
+   * @param {{name: string, initialData?: any, reducers: Reducer}} args
    */
   constructor({ name, initialData, reducers }) {
     this.#keyStore = name;
@@ -98,12 +106,12 @@ class MyShelf {
     //generamos todos las funciones disparadoras
     //partiendo de los reducers configurados
 
-     const reducersArr = Object.entries(reducers).map(([k, v]) => {
+     const actionsArr = Object.entries(reducers).map(([k, v]) => {
       return{
-        /**
-         * @param {any} payload 
+        /** 
+         * @type {Action}
          */
-        [k]: (payload) => {
+        [`${k}Dispatch`]: (payload) => {
           v(this.#data, payload);
           MyGlobalStore.dispatch(this.#keyStore);
         },
@@ -113,18 +121,18 @@ class MyShelf {
     /**
     * @type {{[x: string]: (payload: any)=>void}}
     */
-    let newReducers;
-    reducersArr.forEach((r)=>{
-      newReducers = {...newReducers, ...r}
+    let newActions;
+    actionsArr.forEach((a)=>{
+      newActions = {...newActions, ...a}
     })
-    this.#reducers = newReducers;
+    this.#actions = newActions;
   }
 
   get name(){
     return this.#keyStore;
   }
-  get reducers(){
-    return this.#reducers;
+  get actions(){
+    return this.#actions;
   }
   get data(){
     return this.#data
@@ -133,8 +141,13 @@ class MyShelf {
 
 /**
  * @param {{name: string, initialData: any, reducers: Reducer}} args
- * @returns {MyShelf}
+ * @returns {{name: string, shelf: MyShelf, actions: {[x: string]: Action}}}
  */
 export const createShelf = (args) => {
-  return new MyShelf(args);
+  const newShelf = new MyShelf(args)
+  return {
+    name: newShelf.name,
+    shelf: newShelf,
+    actions: newShelf.actions
+  }
 };

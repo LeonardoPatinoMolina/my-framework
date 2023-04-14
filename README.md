@@ -289,7 +289,8 @@ los métodos de la entidad MyDOM son todos estáticos, cuenta con __doce__ méto
 - __removeMember(targetMember)__: método encargado de remover un componente que ya es miembro de los nodos del árbol, este se reibe como parámetro. Este método es empleado por el framework para remover componentes que son desrenderizados.
 
 ### __MyGlobalStore__
-La administración del estado global en mi framework es llevada a cabo por la clase MyGlobalStore, esta se vale de otra clase llamada __MyShelf__ y una función auxiliar llamada __createShelf__. AL igual que la clase MyDOM es una entidad de única instancia, y engloba la estructura y lógica necesaría para proveer una serie de datos en forma de store global, este sistema sigue el ``patrón reductor`` para la asignación de funciones de mutabilidad de datos del store, y el ``patrón mediador`` para subscribir componentes reactivos al mismo, pues, efectivamente s etratad el estado global de la app.
+La administración del estado global en mi framework es llevada a cabo por la clase MyGlobalStore, esta se vale de otra clase llamada __MyShelf__ y una función auxiliar llamada __createShelf__. AL igual que la clase MyDOM es una entidad de única instancia, y engloba la estructura y lógica necesaría para proveer una serie de datos en forma de store global, este sistema sigue el ``patrón reductor`` para la asignación de funciones de mutabilidad de datos del store, y el ``patrón mediador`` para subscribir componentes reactivos al mismo, pues, efectivamente se trata del estado global de la app.
+
 #### __Atributos__
  La clase MyGlobalStore cuenta con __dos__ atributos que normalmente no tendremos que manipular:
 
@@ -308,9 +309,22 @@ La administración del estado global en mi framework es llevada a cabo por la cl
 
     export const store = MyGlobalStore.configStore({
       reducers: {
-        [userShef.name]: userShef
+        [userShef.name]: userShef.shelf
       }
     });
+    ~~~
+
+    El paso inmediato a este debe ser establecer el store en el árbol de componentes, para ello recordamos un mpetodo menconado anteriormente: ``setGlobalStorage``, este recibe como parámetro el store, de esta forma la entrada de la app se habrá actualizado de la forma siguiente:
+    ~~~Javascript
+    "use strict"
+    import { MyDOM } from "./lib/my_framework/myDOM.js";
+    import { store } from "./context/store.js";
+    import { App } from './app.js'
+
+    const root = MyDOM.createRoot(document.getElementById("root"));
+    root.render(new App());
+
+    MyDOM.setGlobalStore(store);
     ~~~
 
  - __subscribe(shelfName, observer)__: método encargado de subscribir un nuevo componente a un shelf concreto del store, para ello recibe como parámetro el nombre del shelf y la instancia del componente (observer), hemos podido ver un ejemplo con anterioridad, en el cual sibscribimos un componente a través del método ``init()``:
@@ -332,27 +346,66 @@ clase encargada de organizar todo lo relacionado a un estado concreto del store,
 #### __Accessors / Getters__
 La clase MyShelf cuenta con __tres__ _accesors_ o _getters_ los caules tenemos a disposción:
 - __name__: consiste en el nombre del shelf, este que lo identifica y lo distinque de los demás, se espera que sea único.
-- __reducers__: consiste en un objeto que almacena las funciones encargadas de mutar el estado que almacena el shelf, es decir, los datos del store, estos está destinados a ser usados regularmente.
+- __actions__: consiste en un objeto que almacena las funciones dispatch encargadas de mutar el estado que almacena el shelf, es decir, los datos del store, estos está destinados a ser usados regularmente.
 - __data__: consiste en los datos almacenados en el shelf, pueden ser cualquier cosa, un objeto o un dato primitivo, al final será indexado por el nombre del shelf.
 
 #### __createShelf(config)__
-Esta es la función auxiliar a través de la cual podremos crear un shelf, podríamos decir que es un __factory__, esta retorna una instancia de la clase MyShelf, la mejor forma de detallarla es viéndola en acción.
+Esta es la función auxiliar a través de la cual podremos crear un shelf, esta retorna un objeto una instancia de la clase MyShelf, el nombre y las actions. La mejor forma de detallarla es viéndola en acción.
 
-Continuando con el ejemplo anterior de la configuración del __store__ con el método de la clase MyGLobalStore, ``configStore()``, donde se empleó un shledf de nombre __userShelf__, en este veremos como se creó aquel:
+Continuando con el ejemplo anterior de la configuración del __store__ con el método de la clase MyGLobalStore, ``configStore()``, donde se empleó un shelf de nombre __userShelf__, en este veremos como se creó:
 
 ~~~Javascript
 "use strict"
 import { createShelf } from "../../lib/my_framework/GlobalStore.js";
 
-export const userShef = createShelf({
+export const userShelf = createShelf({
   name: 'user',
-  initialData: ['homerpo', 'epa'],
+  initialData: ['user 1', 'user 2'],
   reducers: {
     setUser: (data, payload)=>{
       data.push(payload);
-    }
+    },
   }
 });
 
-export const { setUser } = userShef.reducers;
+export const { setUserDispatch } = userShelf.reducers;
 ~~~
+
+En este ejemplo podemos apreciar le creación de un shelf partiendo de la función __createShelft__, esta recibe como parámetro un objeto de configuración, este objeto se corresponde con los accesors que tratamos previamente, el atributo ``name`` se atribuye al atributo name del _shelf_, el atributo ``initialData`` se coresponde con el valor que inicializa el atributo data del shelf, este es opcional, por último el atributo ``reducers`` consiste en un objeto que contiene cada _función reductora_, en este caso particular tenemos la función reductora: __setUser__, todas ellas reciben como parámetro la ``data`` del shelf y un valor ``payload``, es menester detenernos aquí y detallar un poco más este asunto:
+
+- __data__: se corresponde con los datos almacenados en el shelf, este parámetro se prevee para poder modificarlo a nuestra conveniencia, es esencialmente una referencia de los datos almacenados, por ello debe tratarse de forma adecuada si no queremos sorpresas.
+- __payload__: este parámetro corresponde a el nuevo valor proveniente de la función dispatch, se espera que sea el recurso necesario para la modifcación deseadad del shelf.
+- __setUserDispatch()__:  podemos verla hasta el final del ejemplo, esta proviene del accesor __reducers__, y su nombre es el mismo que la función reductora con la palabra ``Dispatch`` al final, cosa que la distingue de la función reductora. la nomenclatura se da dinámicamente, el nombre "setUser" es arbitrario facilmente pude elegir otro nombre y este le sería añadido la palabra Dispatch al final:
+~~~Javascript
+  removeUser => removeUserDispatch
+~~~
+
+Una vez aclarado estos puntos quiero recordar lo dicho previamente, este diseño está inspirado en __Redux Toolkit__, quiero mostrar un ejemplo en esta tecnología con el mismo store:
+
+~~~Javascript
+"use strict"
+import { createSlice } from "@reduxjs/toolkit";
+
+export const userSlice = createSlice({
+  name: "user",
+  initialState: ['user 1','user 2'],
+  reducers: {
+    setUser: (state, action)=>{
+      state.user.push(action.payload);
+    },
+  }
+});
+
+export const { setUser } = userSlice.actions;
+~~~
+
+Es muy parecida la sintaxis, y de nuevo, elegí este diseño porque quise mantenerlo familiar. Aunque su forma de operar es muy distinta.
+
+## __MyRouter__
+Una vez que hemos conocido la forma de renderizar el componente raíz, a travéz del método render provisto por el método ``createRoot()`` de la clase __MyDOM__ tenemos como alternativa usar el ``enrutador`` de mi framework, este es una entidad única que tiene la capacidad de definir páginas con sus respectivas rutas y estados propios en el historial del navegador.
+
+### __Atributos__:
+La clase MyRouter cuenta con __dos__ atributos públicos que realmente no están destinados a ser usados regularmente, sin embargo conviene conconerlos:
+
+- __currentPage__: refiere a el componente raíz que se encuentra renderizado, a fin de cuentas es quien cumple el rol de página en la app.
+- __pages__: son todos los componentes raices que están dispuestos a participar del enrutamiento.

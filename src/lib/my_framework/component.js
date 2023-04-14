@@ -253,7 +253,7 @@ export class Component {
    */
   #create(wait = false) {
     //convertimos el template a un nodo del DOM
-    const componentNode = string2html(this.build(this.props));
+    const componentNode = string2html(this.build(this.props, this.globalStore));
     this.body = componentNode;
   }//end create
 
@@ -430,10 +430,10 @@ export class Component {
    
    const compare = JSON.stringify(this.state) === JSON.stringify(this.#previusState);
    
+  //  console.log('ja');
    // solo actualizar el componente si el estado a cambiado
    //o si el cambio es del estado global
-   if(compare || forceChange) return;
-
+   if(compare && !forceChange) return;
    this.#didUnmount();
    const previusBody = this.body;
    this.#create(true);

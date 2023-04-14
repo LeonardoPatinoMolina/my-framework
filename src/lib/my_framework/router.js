@@ -2,9 +2,9 @@
 import { Component } from "./component.js";
 import { MyDOM } from "./myDOM.js";
 
-export class Router {
+export class MyRouter {
   /**
-   * @type {Router}
+   * @type {MyRouter}
    */
   static instanceRouter;
 
@@ -26,8 +26,8 @@ export class Router {
    * @param {{pages: Object.<string, typeof Component>, notFound: typeof Component}=} args 
    */
   constructor(args){
-    if(!!Router.instanceRouter){
-      return Router.instanceRouter;
+    if(!!MyRouter.instanceRouter){
+      return MyRouter.instanceRouter;
     }
     this.pages = args?.pages;
     this.#notFound = args?.notFound;
@@ -38,7 +38,7 @@ export class Router {
     window.addEventListener('DOMContentLoaded',()=>{
       this.#renderRoute();
     });
-    Router.instanceRouter = this;
+    MyRouter.instanceRouter = this;
   }
 
   #renderRoute(){
@@ -50,7 +50,7 @@ export class Router {
     
     const dom = new MyDOM();
     MyDOM.clearDOM();
-
+    //@ts-ignore
     const newPage = new page();
     newPage.render(dom.root);
 

@@ -3,6 +3,6 @@ import { userShef } from "./feature/user.js";
 
 export const store = MyGlobalStore.configStore({
   reducers: {
-    [userShef.name]: userShef
+    [userShef.name]: userShef.shelf
   }
 });
