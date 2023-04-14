@@ -1,4 +1,5 @@
 import { Component } from "../lib/my_framework/component.js";
+import { MyRouter } from "../lib/my_framework/router";
 
 export class Counter extends Component{
   constructor(){
@@ -21,8 +22,9 @@ export class Counter extends Component{
     return super.template((_)=>`
     <main>
       <h2>Mi Contador</h2>
-      <p>${this.state.count}</p>
+      <p>${this.state.count} + 10</p>
       <button ${_.on('click', addCount)}>add</button>
+      <button ${_.on('click', ()=>{MyRouter.go(`/resultado/{${this.state.count + 10}}`)})}>Watch de result</button>
     </main>
     `);
   }

@@ -118,14 +118,10 @@ class MyShelf {
       };
     })//end map
   
-    /**
-    * @type {{[x: string]: (payload: any)=>void}}
-    */
-    let newActions;
-    actionsArr.forEach((a)=>{
-      newActions = {...newActions, ...a}
-    })
-    this.#actions = newActions;
+    //convertimo sel arreglo de objetos en un solo objeto
+    this.#actions = actionsArr.reduce((acc, cur) => {
+      return { ...acc, ...cur };
+    }, {});
   }
 
   get name(){

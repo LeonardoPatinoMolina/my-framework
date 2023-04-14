@@ -14,8 +14,12 @@ El presente ejercicio es una continuación de uno anterior llamado __[Mi pequeñ
 
 > __Nota__: No pretendo afirmar que he perfeccionado la técnica, pero definitivamente lo concidero una mejora :)
 
+<hr>
+
 ## __Tecnologías__
 Las tecnologías empleadas son __HTML 5__ y __Javascrit ES6__, los estilos no son objeto de interés para el presente ejercicio, solamente la estructura y manipulación de la interfaz; al contar con html para el maquetado, puede aplicarse cualquiera de los estilizados que este admita: __CSS__, __SASS__, etc. en este caso particular me decanto por __SCSS__ por razones prácticas y de preferencia personal, esta es un dependencia de terceros pero no está involucrada para nada con el framework.
+
+<hr>
 
 ## __Entrada de la App__
 My framework tiene una estructura inicial inspirada en React.js esto significa que toda la composición será anclada a una raíz que se establece desde el inicio del proyecto, la sintaxis es la siguiente:
@@ -31,6 +35,9 @@ root.render(new App());
 > Evidentemente es una sintaxis muy parecida a __React.js__, de hecho es identica jeje, quise mantenerlo familiar.
 
 La clase __MyDom__ es una especie de "virtual dom" que nos porevee una serie de métodos de interés para la estructura general del árbol de componentes, pero realmente son muy pocos los que nos interesan, el primero es el método estático ``createRoot()``, este método establece cuál será la raíz de la app en el __DOM__, será el pibote y la referencia para renderizar todas las interfaces.
+
+<hr>
+
 ## __Componentes__
 Los componentes son fragmentos o maquetas que nos permiten componer las vistas de forma modular, cada uno de ellos se responsabiliza de su diseño y lógica intrínseca, de esta forma podemos modularizar nuestro código haciéndo más amena la experiencia de desarrollo, en el presente framework estos se basan en plantillas literales que siguen un par de reglas para poder transformarse en código html entendible para el navegador, poseen la siguiente sintaxis:
 ~~~Javascript
@@ -229,7 +236,7 @@ veamos en el siguiente ejemplo done lo implementamos para que imprima en consola
     },[]);
     ~~~
 
-    >``Importante``: tanto el callback pricipal como el retornado solo se ejecutarán una vez, esto se debe a que ambos validan el arreglo de dependencias, si desea darle un caracter reactivo distinto a la lógica de desrenderizado (el callback retornado) debe optar por otro __effect()__ con las dependencias que le convengan.
+    >``Importante:`` tanto el callback pricipal como el retornado solo se ejecutarán una vez, esto se debe a que ambos validan el arreglo de dependencias, si desea darle un caracter reactivo distinto a la lógica de desrenderizado (el callback retornado) debe optar por otro __effect()__ con las dependencias que le convengan.
     
     La diferencia que guarda el método __this.$.effect()__ de mi framwwork con __useEffect()__ de React.js es que no pueden repetirse si cuentan con las mismas dependencias, si se intenta crear otro effect() con las mismas dependecias de otro que se encuentra vigente, obtendrá una ``excepción de redundancia``, aunque el callback sea distinto, las dependecnias no pueden ser las mismas en distintos effect(). Otra diferencia algo más práctica es que este método retorna la misma instancia LifeComponent, esta característica fue pensada para conctatenar effects, ejemplo:
     
@@ -260,6 +267,41 @@ LifeComponent cataloga en dos categorías las funciones asociadas a efectos, aqu
 - __dispose()__: método encargado de ejecutar todos los callbacks de efectos de desrenderizado, esto siempre y cuando se encuentren en condiciones de ser invocados, es decir, que sus dependencias lo permitan ya sea porque han mutado o porque están indefinidas.
 - __initialize()__: este método se asegura que cada callback asociada a un efecto update se ejecute mínimo una véz. esto es necesario para poder almacenar el efecto de dispose en caso de existir. pero esta es una carácterística del framework y no require manipularse.
 
+### __Eventos en línea & inputController__
+Este es provablemente el hallazgo más gratificante que realicé durante el desarrollo de este proyecto, la capacidad de declarar el evento de una etiqueta directamente en la plantilla literal de un componente y controlar su vigencia fue todo un reto, sobre todo a la hora de integrar el sistema de __formularios controlados__; en [Mi pequeño framework font-end](https://github.com/LeonardoPatinoMolina/my-peque-o-framework) hice una muy pobre aproximación en la ventana modal de búsqueda dinámica de peliculas a través de un campo de texto, pero no obtuve el resultado que deseaba, mi incapacidad para solucionar esta característica fue una de las principales razones por las que la lógica de los componentes se hacía compleja muy rápidamente, hoy puedo decir que he integrado de forma descente una solución a este dilema
+
+en proceso, he dejado este para el final jeje :)...
+
+<hr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## __MyDOM__
 A esta entidad me refiero cuando hablo de árbol de componentes, consiste en una instancia única que sigue el patrón __Singleton__ pues solo debe existir uno en todo la app. Este no es un __virtual dom__, pero cumple un rol semejante, es gracias a esta entidad que esxiste un pivote, un soporte sobre el cual ensamblar la estrcutura general de todos los componentes que se encuentren en funciónes. Aspectos como sus familias, su petenencia al árbol y la raíz principal.
 ### __Atributos__
@@ -288,7 +330,9 @@ los métodos de la entidad MyDOM son todos estáticos, cuenta con __doce__ méto
 - __setMember(newMember)__: este método añade un nuevo miembro a los nodos del árbol, recibe como parámetro una instancia del  componente que será añadido.
 - __removeMember(targetMember)__: método encargado de remover un componente que ya es miembro de los nodos del árbol, este se reibe como parámetro. Este método es empleado por el framework para remover componentes que son desrenderizados.
 
-### __MyGlobalStore__
+<hr>
+
+## __MyGlobalStore__
 La administración del estado global en mi framework es llevada a cabo por la clase MyGlobalStore, esta se vale de otra clase llamada __MyShelf__ y una función auxiliar llamada __createShelf__. AL igual que la clase MyDOM es una entidad de única instancia, y engloba la estructura y lógica necesaría para proveer una serie de datos en forma de store global, este sistema sigue el ``patrón reductor`` para la asignación de funciones de mutabilidad de datos del store, y el ``patrón mediador`` para subscribir componentes reactivos al mismo, pues, efectivamente se trata del estado global de la app.
 
 #### __Atributos__
@@ -401,11 +445,149 @@ export const { setUser } = userSlice.actions;
 
 Es muy parecida la sintaxis, y de nuevo, elegí este diseño porque quise mantenerlo familiar. Aunque su forma de operar es muy distinta.
 
+<hr>
+
 ## __MyRouter__
 Una vez que hemos conocido la forma de renderizar el componente raíz, a travéz del método render provisto por el método ``createRoot()`` de la clase __MyDOM__ tenemos como alternativa usar el ``enrutador`` de mi framework, este es una entidad única que tiene la capacidad de definir páginas con sus respectivas rutas y estados propios en el historial del navegador.
 
 ### __Atributos__:
 La clase MyRouter cuenta con __dos__ atributos públicos que realmente no están destinados a ser usados regularmente, sin embargo conviene conconerlos:
 
-- __currentPage__: refiere a el componente raíz que se encuentra renderizado, a fin de cuentas es quien cumple el rol de página en la app.
+- __currentPage__: refiere al componente raíz que se encuentra renderizado, a fin de cuentas es quien cumple el rol de página en la app.
 - __pages__: son todos los componentes raices que están dispuestos a participar del enrutamiento.
+
+## __Métodos__
+La clase MyRouter además del constructor cuenta con __cuatro__ métodos públicos, todos estáticos y destinados a uso regular.
+
+### __Constructor__
+El método constructor debe recibir un objeto de configuración en el cual se definan las _painas_, las _rutas_, _params_ y la pestaña _notFound_. Efectivamente este debe inicializarse en la entrada de la app, de esta forma teneos una nueva actualización al fichero main.js:
+~~~Javascript
+//main.js 
+"use strict"
+import { MyDOM } from "./lib/my_framework/myDOM.js";
+import { MyRouter } from "./lib/my_framework/router.js";
+import { store } from "./context/store.js";
+import { PAGES } from "./pages/routes.js";
+import { NotFound } from "./components/notFound.js";
+
+const root = MyDOM.createRoot(document.getElementById("root"));
+
+MyDOM.setGlobalStore(store);
+
+//declaración de router - start
+const router = new MyRouter({
+  pages: PAGES, 
+  notFound: NotFound
+});
+  //declaración de router - end
+
+
+///pages/routes.js
+import { Counter } from "./counter.js";
+import { NotFound } from "../components/notFound";
+import { Result } from "./result";
+
+export const PAGES = new Map([
+  [ "/", Counter],
+  ["/otra", NotFound],
+  ["/resultado/:result", Result],
+]);
+~~~
+
+en este ejemplo vemos la declaración del enrutador, este consiste en inyectar un objeto de configuración cons dos atributos:
+- __pages__: consiste en un objeto __Map__ el cual contiene las rutas como ``key`` y la clase correspondiente a la page como ``value``, algo de suma importancia es que la tercera ruta contiene un _param_, este se declara ubicando dos puntos (:) y su respectivo nombre, en este caso particular tenemos el ``param result``, es a través de este que podremos enviar datos desde una página a otra.
+- __notFound__: este atributo es simplemente un componente o mejor dicho la clase de un componente que tiene la tarea de mostrar una vista que indique el clásico error __not found 404__:
+
+>``Importante:`` Esta inicalización es de suma importancia porque es desde aquí que empezarán los renderizados de nuestras páginas, como se puede apreciar el método render() no aparece por ninguna parte, y eso se debe a que la entidad MyRouter se encarga de ello internamente, de allí que sea importante una correcta declaración de las rutas y componentes raices.
+
+### __De uso regular__
+Estos son métodos que tienen tareas específicas, pero fundamentales en el enrutamiento:
+
+- __go(path)__: método encargado de navegar a la ruta que se le administre mediante el parámetro ``path``. Debe asegurarse que la ruta exista caso contrario deberá asociar una pestaña __notFound__.
+- __next()__: método específico para navegar hacia adelante en el historial siempre que haya un registro ``forward``, es decir, que se haya navegado a otra página con anterioridad.
+- __back()__: método específico para navegar hacia atrás en el historial siempre que haya un registro ``back``, es decir, que se haya navegado a una nueva ventana dejando atrás una ruta previa.
+- __params()__: método especial que obtiene los valores params que hayan sido enviados desde la página anterior, lastimosamente el presente enrutamiento es bastante básico y no admite rutas dinámicas en la _url_, por ello hay una regla base que se debe obedecer para enviar params de una page a otra.
+
+### __Params__
+La comunicación entre una página y otra en mi framework se realiza de forma discreta mediante ``params``, estos son datos que se adjuntan en la declaración de las rutas y el uso del método __go(path)__.
+
+#### __Declaración de rutas__
+ previamente mencionamos la sintaxis de declaración:
+
+En caso de desear un ruta sin params podemos escribirla directamente, importante que las barras inclinadas estén al principio del nombre de la ruta y del param, caso contrario obtendremos comportamientos inesperados:
+~~~Javascript
+ "/about" 
+ "/about/ticked" 
+~~~
+
+En otro caso donde precisemos comunicar un dato de una página a otra como puede ser el típico paso de un ``id`` de _producto_ o de _cliente_, declaramos el nombre del param antecedido por una barra inclinada y dos puntos "__/:__"
+~~~Javascript
+ "/product/:id"
+ "/client/:id"
+~~~
+
+#### __Navegación a ruta__
+Para navegar hasta una ruta específica utilizamo el método __go(path)__, este recibe un string correspondiente a la ruta deseada:
+~~~Javascript
+MyRouter.go('/about');
+MyRouter.go('/about/ticked');
+~~~
+importante que la barra inclinada "/" esté presente siempre, caso contrario obtendremos comportamientos inesperados.
+
+#### __Navegación a ruta con params__
+En caso de que necesitemos comunicar un dato mediante un param utilizamos la siguiente sintaxis:
+
+~~~Javascript
+const clientId = 10002392;
+
+MyRouter.go('/product/{1001}');
+MyRouter.go(`/client/{${clientId}}`);
+~~~
+el valor del param debe estar rodeado por llaves ``"{}"`` esta es una de las reglas que advertí con anterioridad, es necesario para el adecuado funcionamiento del framework. Estos params pueden ser más de uno sin mayor problema, por ejemplo:
+~~~Javascript
+//routes
+const PAGES = Map([["/product/:code/:price": Product]])
+
+// navigation
+const productCode = 72304923;
+const productPrice = 2000;
+
+MyRouter.go(`/product/{${productCode}}/{${productPrice}}`);
+~~~
+Aquí otra regla, al ser varios params igual deben estar precedidos por una barra "__/__". 
+> ``A tener en cuenta:`` los params no se ven reflejados en el url, estos son transmitidos de forma discreta, por ello no tienen la capacidad de intercalarse con nombres de ruta como por ejemplo: "/product/:id/popular"
+
+#### __Obtención de datos params del lado de la página__
+Para la obtención de los params en el cuerpo de la página, el cual no es más que la clase del componente raíz, damos uso del método __params()__, siguiendo con el ejemplo anterior donde navegamos a una página con nombre de ruta ``"product/:code/:price"``, la forma de obtener los datos es la siguiente:
+
+~~~Javascript
+import { Component } from "../lib/my_framework/component.js";
+import { MyRouter } from "../lib/my_framework/router";
+
+export class Product extends Component{
+  constructor(){
+    super('product-page');
+  }
+
+  init(){
+    const { code, price } = MyRouter.params(); 
+    this.state = {
+      code,
+      price
+    };
+  }
+
+  build(){
+    return super.template((_)=>`
+    <main>
+      <h2>Producto</h2>
+      <p>Producto con el código: ${this.state.code}</p>
+      <p>Precio del producto: ${this.state.price}</p>
+      <button ${_.on('click', ()=>{MyRouter.back()})}>Volver</button>
+    </main>
+    `);
+  }
+}
+~~~
+
+Fácilmente contamos con un componente que invoca al método __MyRouter.params()__ desde su método ``init()``, posteriormente lo almacena en su estado local y lo imprime en su plantilla. Así de sensillo, los nombres que declaramos en las rutas serán los que tendrán los atributos del objeto que será retornado por el método params().
