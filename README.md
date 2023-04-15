@@ -1,5 +1,7 @@
 # __My Framework 2.0__
 
+<img src="https://i.postimg.cc/P5hXgpN6/logo-my.png"  style="width: 80%; height: auto;">
+
 El presente ejercicio es una continuación de uno anterior llamado __[Mi pequeño framework font-end](https://github.com/LeonardoPatinoMolina/my-peque-o-framework)__, en el cual me propuse crear un framework front-end de _javascript_ desde los cimientos sin dependecias de terceros; en esta ocasión tengo el mismo propósito, pero planeo reducir la complejidad de su uso, eliminando muchas restricciones y limitaciones, haciéndolo más rápido y consistente.
 
 > Mi única omisión a la regla de no usar dependeencias para el framework fue incluir __Vite__ para la creación de la versión ``build`` minificada, vite es una herramienta muy cómoda y poderosa :). Por otro lado estoy usando un archivo de configuración de typescript para usar su linter, es otra herramienta espectacular jeje.
