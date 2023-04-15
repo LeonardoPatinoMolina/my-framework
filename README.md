@@ -41,6 +41,7 @@ La clase __MyDom__ es una especie de "virtual dom" que nos porevee una serie de 
 ## __Componentes__
 Los componentes son fragmentos o maquetas que nos permiten componer las vistas de forma modular, cada uno de ellos se responsabiliza de su diseño y lógica intrínseca, de esta forma podemos modularizar nuestro código haciéndo más amena la experiencia de desarrollo, en el presente framework estos se basan en plantillas literales que siguen un par de reglas para poder transformarse en código html entendible para el navegador, poseen la siguiente sintaxis:
 ~~~Javascript
+"use strict"
 import { Component } from "../lib/my_framework/component.js";
 
 export class Counter extends Component{
@@ -267,26 +268,180 @@ LifeComponent cataloga en dos categorías las funciones asociadas a efectos, aqu
 - __dispose()__: método encargado de ejecutar todos los callbacks de efectos de desrenderizado, esto siempre y cuando se encuentren en condiciones de ser invocados, es decir, que sus dependencias lo permitan ya sea porque han mutado o porque están indefinidas.
 - __initialize()__: este método se asegura que cada callback asociada a un efecto update se ejecute mínimo una véz. esto es necesario para poder almacenar el efecto de dispose en caso de existir. pero esta es una carácterística del framework y no require manipularse.
 
-### __Eventos en línea & inputController__
-Este es provablemente el hallazgo más gratificante que realicé durante el desarrollo de este proyecto, la capacidad de declarar el evento de una etiqueta directamente en la plantilla literal de un componente y controlar su vigencia fue todo un reto, sobre todo a la hora de integrar el sistema de __formularios controlados__; en [Mi pequeño framework font-end](https://github.com/LeonardoPatinoMolina/my-peque-o-framework) hice una muy pobre aproximación en la ventana modal de búsqueda dinámica de peliculas a través de un campo de texto, pero no obtuve el resultado que deseaba, mi incapacidad para solucionar esta característica fue una de las principales razones por las que la lógica de los componentes se hacía compleja muy rápidamente, hoy puedo decir que he integrado de forma descente una solución a este dilema
+### __Eventos en línea__
+Este es provablemente el hallazgo más gratificante que realicé durante el desarrollo de este proyecto, la capacidad de declarar el evento de una etiqueta directamente en la plantilla literal de un componente y controlar su vigencia fue todo un reto, sobre todo a la hora de integrar el sistema de __formularios controlados__; en [Mi pequeño framework font-end](https://github.com/LeonardoPatinoMolina/my-peque-o-framework) hice una muy pobre aproximación en la ventana modal de búsqueda dinámica de peliculas a través de un campo de texto, pero no obtuve el resultado que deseaba, mi incapacidad para solucionar esta característica fue una de las principales razones por las que la lógica de los componentes se hacía compleja muy rápidamente, hoy puedo decir que he integrado de forma descente una solución a este dilema.
+
+#### __EventController(name, callback, config)__
+Esta es  una característica que hace posible asignar un evento en la plantilla del componente asignando un manejador, podemos asumir que se trata de un ``addEventListener()`` especializado para funcionar en las plantillas de mi framework, este cuenta con __tres__ parámetros:
+
+- __name__: refiere al nombre del evento, los eventos que pueden ser asignados son exactamente los mismos que añadirías cn un _addEventListener()_ de toda la vida.
+- __callback__: refiere al manejador del evento, es quella unción que será ejecutada en cada ocación que el evento se dispare, recibiendo como parámetro el evento.
+- __config__: este es un objeto de configuración análogo al objeto de configuración de un addEventListener y de igual forma es opcional, posee todos los atributos del mismo a excepción del atributo ``signal`` el cual se recerba para funciones internas del framework, repasando las opciones a configurar tenemos:
+~~~Typescript
+{
+  passive: boolean,
+  capture: boolean,
+  once: boolean
+}
+~~~
+>``Nota:`` No me detendré a explicar qué hace cada uno, porque esto no es algo de mi framework, es una funcionalidad propia del método __addEventListener()__ de la clase Element en __Javascript__ 
+
+Podemos ver en acción esta carácteristica de mi famework en el siguiente método _build()_ del componente Counter del ejemplo anterior:
+~~~Javascript
+      build(){
+        const addCount = ()=>{
+          this.update(()=>{
+            this.state.count += 1;
+          })
+        }
+
+        return super.template((_)=>`
+        <main>
+          <h2 id="title">Mi Contador</h2>
+          <p>${this.state.count}</p>
+          <button ${_.on('click', addCount)}>add</button>
+        </main>
+      `);
+    }
+~~~
+En la estiqueta ``button`` podemos ver el eventController, este proviente desde el parámetro del método __template()__, en este caso particular está identificado con una rralla al piso "**_**", este ejemplo añade un evento click a la etiqueta de modo que en cada click hecho en ella ejecuta el manejador __addCount()__ incremementando el estado __count__.
+Si aislamos su sintaxis tenemos lo siguiente:
+~~~Javascript
+_.on('click', addCount)
+~~~
+como dije anteriormente podemos interpretarlo como un addEventListener:
+~~~Javascript
+element.addEventListener('click', addCount)
+~~~
+Pero este evento es añadido a la etiqueta puntual en la que se declara, por ello es una asignación de evento en línea, y pueden añadirse tantos como se necesique en un solo componente, teniendo como limitación lo que __Javascript__ o __HTML__ nos imponga. Estos son administrados internamente, no hace falta preocuparse por removerlos, eso es tarea de mi framework, internamente se determina cual es el momento oportuno para ello.
+
+#### __InputController(callback) y formularios controlados__
+Este fue el principal reto de esta inventiva, identifiquemos primero cual es el problema a resolver.
+
+#### __El problema__
+``My framework`` es una herramienta para desarrollar aplicaciones front-end de página única con componentes _reactivos_ cuya principal característica es que constantemente se re renderizan con la finalidad de actualizar la vista. 
+
+Imagine un usuario ingresando su información en un formulario de registro, el valor ingresado es un dato que pertenece al campo de texto que se encuentra renderizado en ese momento, pero antes de culminar su diligencia, el usuario decide hacer una pequeña acción en la vista que implica ``re renderizar`` el árbol de componentes del cual participan los campos del formulario. Aquel dato previamente ingresado en el campo del formulario __no es persitente por definición__, solo el estado local del componente y el globalStore son los datos capaces de persisitir entre re rederizados, __¿debemos hacer que el valor del campo sea un estado?__, pero por supuesto, __¿se solucionó el problema?__, lastimosamente no, o no exactamente.
+
+Esta situación acarrea una serie de problemas con arreglo a la experiencia del usuario en los campos de un formulario lo suficientemente elavorados como para requerir una solución especializada. Pérdida del foco, perdida de la ubicación del cursor y pérdida de datos ingresados. Si quería garantizar la correcta funcionalidad de los __formularios__ en mi framework debía lidíar con estos asuntos.
+
+
+#### __La solución__
+
+>``Nota:`` Me recerbo los detalles internos de su implementaición, tiene a su disposición el código empleado para ello.
+
+La solución consistió en una combinación del resguardo de: datos ingresados, posición del cursor y estado de foco del campo involurado. la sintaxis final resultó ser sensilla. Antes de recurrir a un ejemplo de mi faramework veamos como es un ``formulario controlado`` en una biblioteca de componentes reactivos como __React.js__:
+
+~~~Javascript
+"use strict"
+import { useState } from 'react';
+
+export const Form ()=>{
+  
+  const [formData, setFormData] = useState({
+    nombre: '',
+    apellido: '',
+  });
+
+  const changeHandler = ({target}) =>{
+    const {name, value} = target;
+    setFormData(prevData => ({
+      ...prevData, 
+      [name]: value
+    }));
+  }
+
+  return (
+    <form onSubmit={(e)=>{e.preventDefault()}}>
+      <label>
+        nombre:
+        <input 
+          type="text" 
+          onChange={changeHandler} 
+          name="nombre"
+          value={formData.nombre}
+        >
+      </label>
+      <label>
+        apellido:
+        <input 
+          type="text" 
+          onChange={changeHandler} 
+          name="apellido"
+          value={formData.apellido}
+        >
+      </label>
+      <button type="submit">Enviar</button>
+    </form>
+  );
+}
+~~~
+Aquí tenemos un rapido ejemplo de un componente funcional de __React.js__ de nombre __Form__ que consiste en un formulario con dos campos de texto que se encuetran controlados por un estado __formData__, se observa el evento ``onChange`` y se maneja actuálizandolo y mostrando siempre el valor ingresado en el atributo value de la etiqueta __input__. Esta es la forma en la que __React.js__ soluciona el problema que he mencionado respecto a la persistencia de los datos ingresados en el formulario, los demás detalles los soluciona de forma interna.
+
+Ahora veamos este mismo ejemplo, pero en un componemte de my framework:
+
+~~~Javascript
+"use strict"
+import { Component } from "../lib/my_framework/component.js";
+
+export class Form extends Component{
+  constructor(){
+    super('form');
+  }
+
+  init(){
+    this.state = {
+      formData: {
+        nombre: '',
+        apellido: ''
+      }
+    };
+  }
+
+  build(){
+    const inputsHandler = ({target})=>{
+      const { name, value } = target;
+
+      this.update(()=>{
+        this.state.formData = {
+          ...this.state.formData,
+          [name]: value
+        }
+      })
+    }
+
+    return super.template((_)=>`
+    <form ${_.on('submit',(e)=>{e.preventDefault()})}>
+      <label>
+        nombre:
+        <input 
+          type="text" 
+          ${_.inputController(inputsHandler)} 
+          name="nombre"
+          value="${this.state.formData.nombre}"
+        >
+      </label>
+      <label>
+        apellido:
+        <input 
+          type="text" 
+          ${_.inputController(inputsHandler)} 
+          name="apellido"
+          value="${this.state.formData.apellido}"
+        >
+      </label>
+      <p>${this.state.count}</p>
+      <button ${_.on('click', addCount)}>add</button>
+    </main>
+    `);
+  }
+}
+~~~
+La sintaxis es semejante a un __eventController()__, pero no podemos afirar que es un __addEventListener__
 
 en proceso, he dejado este para el final jeje :)...
 
 <hr>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

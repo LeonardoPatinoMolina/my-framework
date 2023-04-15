@@ -8,7 +8,8 @@ export class Counter extends Component{
 
   init(){
     this.state = {
-      count: 0
+      count: 0,
+      text: ''
     };
   }
 
@@ -19,12 +20,21 @@ export class Counter extends Component{
       })
     }
 
+    const upd = (e)=>{
+      this.update(()=>{
+        this.state.text = e.target.value
+      })
+    }
+
     return super.template((_)=>`
     <main>
       <h2>Mi Contador</h2>
       <p>${this.state.count} + 10</p>
       <button ${_.on('click', addCount)}>add</button>
       <button ${_.on('click', ()=>{MyRouter.go(`/resultado/{${this.state.count + 10}}`)})}>Watch de result</button>
+      <input type="text" ${_.inputController(upd)} value="${this.state.text}">
+      <br>
+      <input type="text" ${_.inputController(upd)} value="${this.state.text}">
     </main>
     `);
   }
