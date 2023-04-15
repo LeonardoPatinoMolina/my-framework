@@ -1,5 +1,4 @@
 "use strict"
-import { string2html } from "../utils.js";
 import { EventController } from "./eventController";
 import { InputController } from "./inputController";
 import { Life } from "./lifeComponent.js";
@@ -189,10 +188,8 @@ export class Component {
     try {
       if(!this.#initialized) {
         this.ready();
-        // this.#addEvents();
         this.#eventController.addEvents();
         this.#inputController.addInputController();
-        // this.#addController();
         this.$.initialize();
         this.#initialized = true;
       }
@@ -209,10 +206,8 @@ export class Component {
   async #didUnmount(){
     if(!this.#initialized) return;
     // this.$.dispose();
-    // this.#removeEvents();
     this.#eventController.removeEvents();
     this.#inputController.removeInputController();
-    // this.#removeController();
     this.#rendered = false;
     this.#firstMount = false;
 
@@ -229,8 +224,6 @@ export class Component {
   if(this.#firstMount) return;
     // this.$.update();
     this.ready();
-    // this.#addEvents();
-    // this.#addController();
     this.#inputController.addInputController();
     this.#eventController.addEvents();
 
@@ -247,9 +240,20 @@ export class Component {
    */
   #create(wait = false) {
     //convertimos el template a un nodo del DOM
-    const componentNode = string2html(this.build(this.props, this.globalStore));
+    const componentNode = this.#string2html(this.build(this.props, this.globalStore));
     this.body = componentNode;
   }//end create
+
+/**
+ * Transforma un texto plano en nodos html
+ * @param {string} str
+ * @returns {Element}
+ */
+  #string2html = (str) => {
+  let parser = new DOMParser();
+  let doc = parser.parseFromString(str, "text/html");
+  return doc.body.children[0];
+}
 
   /**
    * Encargado de generar la plantilla del componente
@@ -371,9 +375,15 @@ export class Component {
    */
   async clear(){
     this.#initialized = false;
-    this.#didUnmount();
+    this.#eventController.removeEvents();
+    this.#inputController.removeInputController();
     this.$.dispose();
     this.#rendered = false;
     this.#firstMount = true;
+    
+    MyDOM.getFamily(this)?.forEach(childKey=>{
+      const child = MyDOM.getMember(childKey)
+      child.clear();
+    })//end foreach
   }// end clear
 }

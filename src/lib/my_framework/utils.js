@@ -10,16 +10,6 @@ export const $ = (selector) => document.querySelector(selector);
 export const $$ = (selector) => document.querySelectorAll(selector);
 
 /**
- * Transforma un texto plano en nodos html
- * @param {string} str
- * @returns {Element}
- */
-export const string2html = (str) => {
-  let parser = new DOMParser();
-  let doc = parser.parseFromString(str, "text/html");
-  return doc.body.children[0];
-}
-/**
  * Función encargada de realizar consultas a servicios api,
  * mientras las almacena en cache para evitar sobre carga de consultas
  * @param {string} urlResponse ruta de consulta de la consulta

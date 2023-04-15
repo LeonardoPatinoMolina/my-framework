@@ -1,10 +1,36 @@
 # __My Framework 2.0__
 
 El presente ejercicio es una continuación de uno anterior llamado __[Mi pequeño framework font-end](https://github.com/LeonardoPatinoMolina/my-peque-o-framework)__, en el cual me propuse crear un framework front-end de _javascript_ desde los cimientos sin dependecias de terceros; en esta ocasión tengo el mismo propósito, pero planeo reducir la complejidad de su uso, eliminando muchas restricciones y limitaciones, haciéndolo más rápido y consistente.
+
 > Mi única omisión a la regla de no usar dependeencias para el framework fue incluir __Vite__ para la creación de la versión ``build`` minificada, vite es una herramienta muy cómoda y poderosa :). Por otro lado estoy usando un archivo de configuración de typescript para usar su linter, es otra herramienta espectacular jeje.
 
+## __Contenido__
+El contenido que documenta el presente proyecto no comprende cada aspecto de la implementación y estructura en profundidad de las más de __1200__ líneas de código que fueron necesarias para su realización, se limíta a documentar los aspectos fundamentales y necesarios para su uso y correcto funcionamiento, de suyo sea que los diagramas mostrarán algunas clases que no cuentan con secciones que las desglosen de froma concreta en el contenido.
+
+- [Puntos de corrección](#puntos-de-correción)
+- [Diagrama de clases](#diagrama-de-clases)
+- [Tecnologías](#tecnologías)
+- [Entrada de la app](#entrada-de-la-app)
+- [Componentes](#componentes)
+  - [Component](#component)
+- [Ciclo de vida](#ciclo-de-vida)
+  - [LifeComponent](#lifecomponent)
+- [Eventos en línea](#eventos-en-línea)
+  - [EventController](#eventcontrollername-callback-config)
+  - [InputController](#inputcontrollercallback-y-formularios-controlados)
+- [MyDOM](#mydom)
+- [MyGlobalStore](#myglobalstore)
+  - [MyShelf](#myshelf)
+- [MyRouter](#myrouter)
+- [Concluciones](#myrouter)
+
+## __Diagrama de clases__
+en proceso...
+
+## __Puntos de Correción__
+
  algunos puntos que quise corregir de mi anterior intento a este son los siguientes: 
-|Característica|Mi pequeño framework|mi framework 2.0|
+|Característica|Mi pequeño framework|my framework 2.0|
 |---|---|---|
 |__Asíncronía__| no está manejada de la mejor forma, los componentes no puedes renderizarse sin antes haber culminado sus tareas asíncronas, las cuales estan acopladas al proceso de renderizado.| las tareas asíncronas han sido desacopladas del proceso de renderizado y migradas a métodos sobreescritos y un atributo auxiliar para manejarlas más directamente|
 |__Ciclo de vida__| una preocupación demasiado relevante a la hora de añadir lógica, tanto así que es necesario implementar _dos_ métodos distintos para ello, duplicando el trabajo y las posibilidades de error.| ha sido centralizado en el funcionamiento de un atributo __$__ el cual es capaz de ejecutar lógica reactiva, esta característica sería análoga a useEffect de __React.js__.|
@@ -72,7 +98,7 @@ export class Counter extends Component{
   }
 }
 ~~~
-Inmediatamente se puede apreciar que se trata de un __componente de clase__, efectivamente mi framework tiene como base componetes de clase, tal y como lo era mi anterior ejecicio: [Mi pequeño framework font-end](https://github.com/LeonardoPatinoMolina/my-peque-o-framework), pero este es mucho más elegante, este componente es reactivo, es capaz de re renderizarse para actualizar la vista, pero primero señalaré aspectos más fundamentales. El compomnente __Counter__ está heredando de la clase __Component__, esta exije obligatoriamente como primer argumento un __string__, este debe ser un dato único debido a que será la identidad del componente, lo que lo distinque de los demás, una especie de ``key`` (de hecho así se llama jeje).
+Inmediatamente se puede apreciar que se trata de un __componente de clase__, efectivamente my framework tiene como base componetes de clase, tal y como lo era mi anterior ejecicio: [Mi pequeño framework font-end](https://github.com/LeonardoPatinoMolina/my-peque-o-framework), pero este es mucho más elegante, este componente es reactivo, es capaz de re renderizarse para actualizar la vista, pero primero señalaré aspectos más fundamentales. El compomnente __Counter__ está heredando de la clase __Component__, esta exije obligatoriamente como primer argumento un __string__, este debe ser un dato único debido a que será la identidad del componente, lo que lo distinque de los demás, una especie de ``key`` (de hecho así se llama jeje).
 
 En este caso tenemos un clásico contador, gracias a este ejemplo tan típico tengo espacio para exponer rápidamente la existencia del estado, este es un dato que persiste entre re renderizados, pero no no persiste ante desrenderizados, ya llegaremos allá.
 
@@ -83,7 +109,7 @@ La clase cuenta con __diez 10__ atributos públicos que tendremos a nuestra disp
 
 - __$__: atributo encargado de efectos reactivos al ciclo de vida del componente, este atributo es una instancia de otra clase que detallaré más adelante.
 - __body__: referencia del nodo del DOM al cual corresponde el componente, este puede ser utilizado para la selección de nodos directamente con métodos de manipulación del DOM, ya sea para añadir _eventos escucha_ o para un escrutinio mayor de los nodos.
-- __globalStore__: atributo especial que hace referencia a la store global a la cual se encuetra subscrito el componente, este es el estado global de la aplicación, mi framework cuenta con un sistema de administración de estado global que sigue el ``patrón mediador de eventos`` y el ``patrón reductor``, lo detallaré más adelante.
+- __globalStore__: atributo especial que hace referencia a la store global a la cual se encuetra subscrito el componente, este es el estado global de la aplicación, my framework cuenta con un sistema de administración de estado global que sigue el ``patrón mediador de eventos`` y el ``patrón reductor``, lo detallaré más adelante.
 - __isInitialized__: atributo ``booleano`` que hace un seguimiento a la inicialización del componente, este estatus se establece en ``true`` cuando es _instanciado_, y vuelve a ``false`` cuando es _desrenderizado_, el ciclo de vida de los componentes se detallará mas adelante.
 - __isFirstMount__: atributo ``booleano`` que hace un seguimiento a la primera renderización del componente, este estatus es ``true`` al renderizarse por primera vez y vuelve a ``false`` en los renderizados siguientes, sin embargo, regresa a ser ``true`` cuando se desrenderiza, más detalles en la explicación del ciclo de vida.
 - __isRendered__: atributo ``booleano`` que hace un seguimiento al renderizado en vigor del componente, la diferencia con _isInitialized_, es que este asegura que el componente se encuetra renderizado en cambio aquel no, de nuevo, estará algo más claro cuando detalle el ciclo de vida de un componente.
@@ -122,7 +148,7 @@ Ahora pasamos a los métodos, la clase Component sin contar el método contructo
 Cada objeto hace referencia a los datos que serán inyectados por el constructor, esto incluye la ``key`` y las ``props``, la cantidad final de componentes acoplados será equivalente a la cantidad de objetos de la lista.
 
 #### __De lógica interna__
-- __render()__: método encargado de renderizar el componente, este método exige una serie de condiciones que dificilmente podremos reproducir desde la declaración del componente, su función es acoplar el componente actual al DOM en base a la raíz generada por el método ``attach()`` o ``attachMany()``, no hace falta manipularlo, mi framework se encarga de ello.
+- __render()__: método encargado de renderizar el componente, este método exige una serie de condiciones que difícilmente podremos reproducir desde la declaración del componente, su función es acoplar el componente actual al DOM en base a la raíz generada por el método ``attach()`` o ``attachMany()``, no hace falta manipularlo, my framework se encarga de ello.
 - __(asíncrono) clear()__: método encargado de "limpiar" el componente del árbol, esto implica removerlo de _MyDOM_, del árbol en sí y reestablecer todos los eventos y funciones asociadas al mismo. Es la forma que tiene el framework de liberar de la estructura principal un componente para dar espacio a los demás.
 
 ## __Ciclo de vida__
@@ -160,7 +186,7 @@ El ciclo de vida de un componente tiene __cuatro__  estadios o estados, estos at
       `);
     }
     ~~~
-3. __Actualización (re renderizado)__: etapa en la cual el componente se desmonta y se vuelve a montar con la finalidad de actualizar la vista con el nuevo estado, el método encargado de ejecutarse en cada actualización es el mismo ``ready()``, en cada actualización el componente vuelve a ejecutar este método, por este mótivo la lógica que este envuelva debe contemplar esta característica. Para manejar de forma controlada esta etapa del ciclo de vida del componente mi framework emplea un atributo que consiste en la instancia de una clase llamada __LifeComponent__ cuya principal función es hacer seguimiento a esta etapa, este atributo es: __$__, provee un método llamado __effect()__, el cual es un análogo a ``useEffect()`` de React.js, y funciona exactamente igual jeje. un ejemplo rápido de como imprimir un "hola mundo en cada actualización" es diretamente hacerlo en el método ``ready()``:
+3. __Actualización (re renderizado)__: etapa en la cual el componente se desmonta y se vuelve a montar con la finalidad de actualizar la vista con el nuevo estado, el método encargado de ejecutarse en cada actualización es el mismo ``ready()``, en cada actualización el componente vuelve a ejecutar este método, por este mótivo la lógica que este envuelva debe contemplar esta característica. Para manejar de forma controlada esta etapa del ciclo de vida del componente my framework emplea un atributo que consiste en la instancia de una clase llamada __LifeComponent__ cuya principal función es hacer seguimiento a esta etapa, este atributo es: __$__, provee un método llamado __effect()__, el cual es un análogo a ``useEffect()`` de React.js, y funciona exactamente igual jeje. un ejemplo rápido de como imprimir un "hola mundo en cada actualización" es diretamente hacerlo en el método ``ready()``:
     ~~~Javascript
       ready(){
         console.log("hola mundo");
@@ -268,11 +294,11 @@ LifeComponent cataloga en dos categorías las funciones asociadas a efectos, aqu
 - __dispose()__: método encargado de ejecutar todos los callbacks de efectos de desrenderizado, esto siempre y cuando se encuentren en condiciones de ser invocados, es decir, que sus dependencias lo permitan ya sea porque han mutado o porque están indefinidas.
 - __initialize()__: este método se asegura que cada callback asociada a un efecto update se ejecute mínimo una véz. esto es necesario para poder almacenar el efecto de dispose en caso de existir. pero esta es una carácterística del framework y no require manipularse.
 
-### __Eventos en línea__
+## __Eventos en línea__
 Este es provablemente el hallazgo más gratificante que realicé durante el desarrollo de este proyecto, la capacidad de declarar el evento de una etiqueta directamente en la plantilla literal de un componente y controlar su vigencia fue todo un reto, sobre todo a la hora de integrar el sistema de __formularios controlados__; en [Mi pequeño framework font-end](https://github.com/LeonardoPatinoMolina/my-peque-o-framework) hice una muy pobre aproximación en la ventana modal de búsqueda dinámica de peliculas a través de un campo de texto, pero no obtuve el resultado que deseaba, mi incapacidad para solucionar esta característica fue una de las principales razones por las que la lógica de los componentes se hacía compleja muy rápidamente, hoy puedo decir que he integrado de forma descente una solución a este dilema.
 
-#### __EventController(name, callback, config)__
-Esta es  una característica que hace posible asignar un evento en la plantilla del componente asignando un manejador, podemos asumir que se trata de un ``addEventListener()`` especializado para funcionar en las plantillas de mi framework, este cuenta con __tres__ parámetros:
+### __EventController(name, callback, config)__
+Esta es  una característica que hace posible asignar un evento en la plantilla del componente asignando un manejador, podemos asumir que se trata de un ``addEventListener()`` especializado para funcionar en las plantillas de my framework, este cuenta con __tres__ parámetros:
 
 - __name__: refiere al nombre del evento, los eventos que pueden ser asignados son exactamente los mismos que añadirías cn un _addEventListener()_ de toda la vida.
 - __callback__: refiere al manejador del evento, es quella unción que será ejecutada en cada ocación que el evento se dispare, recibiendo como parámetro el evento.
@@ -284,7 +310,7 @@ Esta es  una característica que hace posible asignar un evento en la plantilla 
   once: boolean
 }
 ~~~
->``Nota:`` No me detendré a explicar qué hace cada uno, porque esto no es algo de mi framework, es una funcionalidad propia del método __addEventListener()__ de la clase Element en __Javascript__ 
+>``Nota:`` No me detendré a explicar qué hace cada uno, porque esto no es algo de my framework, es una funcionalidad propia del método __addEventListener()__ de la clase Element en __Javascript__ 
 
 Podemos ver en acción esta carácteristica de mi famework en el siguiente método _build()_ del componente Counter del ejemplo anterior:
 ~~~Javascript
@@ -313,9 +339,9 @@ como dije anteriormente podemos interpretarlo como un addEventListener:
 ~~~Javascript
 element.addEventListener('click', addCount)
 ~~~
-Pero este evento es añadido a la etiqueta puntual en la que se declara, por ello es una asignación de evento en línea, y pueden añadirse tantos como se necesique en un solo componente, teniendo como limitación lo que __Javascript__ o __HTML__ nos imponga. Estos son administrados internamente, no hace falta preocuparse por removerlos, eso es tarea de mi framework, internamente se determina cual es el momento oportuno para ello.
+Pero este evento es añadido a la etiqueta puntual en la que se declara, por ello es una asignación de evento en línea, y pueden añadirse tantos como se necesique en un solo componente, teniendo como limitación lo que __Javascript__ o __HTML__ nos imponga. Estos son administrados internamente, no hace falta preocuparse por removerlos, eso es tarea de my framework, internamente se determina cual es el momento oportuno para ello.
 
-#### __InputController(callback) y formularios controlados__
+### __InputController(callback) y formularios controlados__
 Este fue el principal reto de esta inventiva, identifiquemos primero cual es el problema a resolver.
 
 #### __El problema__
@@ -323,7 +349,7 @@ Este fue el principal reto de esta inventiva, identifiquemos primero cual es el 
 
 Imagine un usuario ingresando su información en un formulario de registro, el valor ingresado es un dato que pertenece al campo de texto que se encuentra renderizado en ese momento, pero antes de culminar su diligencia, el usuario decide hacer una pequeña acción en la vista que implica ``re renderizar`` el árbol de componentes del cual participan los campos del formulario. Aquel dato previamente ingresado en el campo del formulario __no es persitente por definición__, solo el estado local del componente y el globalStore son los datos capaces de persisitir entre re rederizados, __¿debemos hacer que el valor del campo sea un estado?__, pero por supuesto, __¿se solucionó el problema?__, lastimosamente no, o no exactamente.
 
-Esta situación acarrea una serie de problemas con arreglo a la experiencia del usuario en los campos de un formulario lo suficientemente elavorados como para requerir una solución especializada. Pérdida del foco, perdida de la ubicación del cursor y pérdida de datos ingresados. Si quería garantizar la correcta funcionalidad de los __formularios__ en mi framework debía lidíar con estos asuntos.
+Esta situación acarrea una serie de problemas con arreglo a la experiencia del usuario en los campos de un formulario lo suficientemente elavorados como para requerir una solución especializada. Pérdida del foco, perdida de la ubicación del cursor y pérdida de datos ingresados. Si quería garantizar la correcta funcionalidad de los __formularios__ en my framework debía lidíar con estos asuntos.
 
 
 #### __La solución__
@@ -430,32 +456,30 @@ export class Form extends Component{
           value="${this.state.formData.apellido}"
         >
       </label>
-      <p>${this.state.count}</p>
-      <button ${_.on('click', addCount)}>add</button>
+      <button type="submit">Enviar</button>
     </main>
     `);
   }
 }
 ~~~
-La sintaxis es semejante a un __eventController()__, pero no podemos afirar que es un __addEventListener__
+En este ejemplo vemos exactamente la misma situación que con el componente Form de _React.js_, pero con toda las reglas de my framework y sus métodos. La sintaxis es semejante a un __eventController()__, pero no podemos afirmar que se trata de un __addEventListener__, este es un controlador específico para etiquetas de entrada de teclado, lo cual inlcuye:
+~~~html
+<input type="text">
+<input type="number">
+<input type="email">
+<input type="date">
+<input type="time">
+<input type="tel">
+<input type="password">
+<textarea></textarea>
+~~~
+> ``Importante:`` como una excepción tenemos el __\<input type="range">__, para controlar este input puede optar por el eventController() y manejar el _value_ con el evento input. El input controller no funcionará adecuadamente y padecerá comportamientos inesperados. El resto de etiquetas input como checkbox o radio, etc.. pueden manejarse con eventos comunes, no hacen parte del problema que dio origen al inputController, solo las previamnte señaladas.
 
-en proceso, he dejado este para el final jeje :)...
+Y al ser tan especializado, no ocupa nombrar algún evento, basta con administrarle el callback o manejador que recibirá el evento y se ejecutará al momento que se dispare.
+
+
 
 <hr>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ## __MyDOM__
 A esta entidad me refiero cuando hablo de árbol de componentes, consiste en una instancia única que sigue el patrón __Singleton__ pues solo debe existir uno en todo la app. Este no es un __virtual dom__, pero cumple un rol semejante, es gracias a esta entidad que esxiste un pivote, un soporte sobre el cual ensamblar la estrcutura general de todos los componentes que se encuentren en funciónes. Aspectos como sus familias, su petenencia al árbol y la raíz principal.
@@ -488,15 +512,15 @@ los métodos de la entidad MyDOM son todos estáticos, cuenta con __doce__ méto
 <hr>
 
 ## __MyGlobalStore__
-La administración del estado global en mi framework es llevada a cabo por la clase MyGlobalStore, esta se vale de otra clase llamada __MyShelf__ y una función auxiliar llamada __createShelf__. AL igual que la clase MyDOM es una entidad de única instancia, y engloba la estructura y lógica necesaría para proveer una serie de datos en forma de store global, este sistema sigue el ``patrón reductor`` para la asignación de funciones de mutabilidad de datos del store, y el ``patrón mediador`` para subscribir componentes reactivos al mismo, pues, efectivamente se trata del estado global de la app.
+La administración del estado global en my framework es llevada a cabo por la clase MyGlobalStore, esta se vale de otra clase llamada __MyShelf__ y una función auxiliar llamada __createShelf__. AL igual que la clase MyDOM es una entidad de única instancia, y engloba la estructura y lógica necesaría para proveer una serie de datos en forma de store global, este sistema sigue el ``patrón reductor`` para la asignación de funciones de mutabilidad de datos del store, y el ``patrón mediador`` para subscribir componentes reactivos al mismo, pues, efectivamente se trata del estado global de la app.
 
-#### __Atributos__
+### __Atributos__
  La clase MyGlobalStore cuenta con __dos__ atributos que normalmente no tendremos que manipular:
 
  - __store__: este atributo es un objeto __Map__ que almacena todas las store las cuales consisten en instancias de la clase ``MyShelf``, estan son indexadas por su ``reducerpath``, el cual es una cadena de texto que se declara en la clase MyShelf, cual será detallada más adelante.
  - __observers__: este atributo es un objeto __Map__ que almacena todos los componentes que se encuentran subscritos a un store concreto.
 
- #### __Metodos__
+ ### __Métodos__
  Todos los métodos de la clase MyGlobalStore son estáticos, cuenta con __tres__ métodos destinados a declarar, subscribir y despachar:
 
  - __configStore(config)__: método encargado de configurar la store principal, este recibe como parámetro un objeto de configuración donde se asignan los reductores de cada Shelf para ser proveidos por la clase. En el ejemplo siguiente, vemos como se utiliza el método para configurar una store que distribuye un shelf de nombre ``userShelf``, con este fin recibe el objeto de configuración el cual posee un atributo ``reducers`` en el cual se asigna, a la propiedad con el nombre correspondiente de userShelf, la instancia de este Shelf, la creación de este último será tratada más adelante.
@@ -603,7 +627,7 @@ Es muy parecida la sintaxis, y de nuevo, elegí este diseño porque quise manten
 <hr>
 
 ## __MyRouter__
-Una vez que hemos conocido la forma de renderizar el componente raíz, a travéz del método render provisto por el método ``createRoot()`` de la clase __MyDOM__ tenemos como alternativa usar el ``enrutador`` de mi framework, este es una entidad única que tiene la capacidad de definir páginas con sus respectivas rutas y estados propios en el historial del navegador.
+Una vez que hemos conocido la forma de renderizar el componente raíz, a travéz del método render provisto por el método ``createRoot()`` de la clase __MyDOM__ tenemos como alternativa usar el ``enrutador`` de my framework, este es una entidad única que tiene la capacidad de definir páginas con sus respectivas rutas y estados propios en el historial del navegador.
 
 ### __Atributos__:
 La clase MyRouter cuenta con __dos__ atributos públicos que realmente no están destinados a ser usados regularmente, sin embargo conviene conconerlos:
@@ -664,7 +688,7 @@ Estos son métodos que tienen tareas específicas, pero fundamentales en el enru
 - __params()__: método especial que obtiene los valores params que hayan sido enviados desde la página anterior, lastimosamente el presente enrutamiento es bastante básico y no admite rutas dinámicas en la _url_, por ello hay una regla base que se debe obedecer para enviar params de una page a otra.
 
 ### __Params__
-La comunicación entre una página y otra en mi framework se realiza de forma discreta mediante ``params``, estos son datos que se adjuntan en la declaración de las rutas y el uso del método __go(path)__.
+La comunicación entre una página y otra en my framework se realiza de forma discreta mediante ``params``, estos son datos que se adjuntan en la declaración de las rutas y el uso del método __go(path)__.
 
 #### __Declaración de rutas__
  previamente mencionamos la sintaxis de declaración:
@@ -746,3 +770,6 @@ export class Product extends Component{
 ~~~
 
 Fácilmente contamos con un componente que invoca al método __MyRouter.params()__ desde su método ``init()``, posteriormente lo almacena en su estado local y lo imprime en su plantilla. Así de sensillo, los nombres que declaramos en las rutas serán los que tendrán los atributos del objeto que será retornado por el método params().
+
+## __Conclusiones__
+en proceso...

@@ -1,4 +1,4 @@
-import { Component } from "./component";
+import { Component } from "./component.js";
 
 export class InputController {
   /**
@@ -85,7 +85,6 @@ export class InputController {
       },{signal: abortC.signal});// end keyup eventlistener
 
       document.addEventListener('click',(e)=>{
-        console.log(0);
         if(e.target !== target){
           controller.state = {
             value: target.value,
@@ -102,7 +101,6 @@ export class InputController {
     this.#inputcontrollers.forEach((controller)=>{
       this.#abortControllers.get(controller.targetKey).abort();
     });
-
     this.#counterKeyController = 0;
   }//end removeController
 }

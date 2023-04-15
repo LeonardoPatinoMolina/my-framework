@@ -43,7 +43,7 @@ export class EventController{
    * y retornar los atributps de selección
    * @param {string} name 
    * @param {any} callback 
-   * @param {Config} config 
+   * @param {Config=} config 
    * @returns {string}
    */
   onEvent(name, callback, config){
@@ -83,4 +83,3 @@ export class EventController{
     this.#counterKeyEvent = 0;
   }//end removeEvents
 }
-

@@ -9,8 +9,9 @@ export class Counter extends Component{
   init(){
     this.state = {
       count: 0,
-      text: ''
+      text: '',
     };
+    
   }
 
   build(){
@@ -30,9 +31,8 @@ export class Counter extends Component{
     <main>
       <h2>Mi Contador</h2>
       <p>${this.state.count} + 10</p>
-      <button ${_.on('click', addCount)}>add</button>
+      <button style="margin-bottom: 1rem;" ${_.on('click', addCount)}>add</button>
       <button ${_.on('click', ()=>{MyRouter.go(`/resultado/{${this.state.count + 10}}`)})}>Watch de result</button>
-      <input type="text" ${_.inputController(upd)} value="${this.state.text}">
       <br>
       <input type="text" ${_.inputController(upd)} value="${this.state.text}">
     </main>

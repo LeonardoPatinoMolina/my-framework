@@ -125,12 +125,12 @@ export class MyRouter {
   static params(){
     const router = new MyRouter();
     const hState = history.state;
-    const routes = router.#routes.get(hState.path);
+    const routes = router.#routes.get(hState?.path);
 
     //creamos un objeto a partir de las rutas y los params asociados
     //esto es posible gracias a que el orden de los
     //elementos es equivalente en ambos arreglos
-    const params =  routes.reduce((acc, cur, indx) => {
+    const params =  routes?.reduce((acc, cur, indx) => {
       return { ...acc, [cur]: hState.params[indx] };
     }, {});
 

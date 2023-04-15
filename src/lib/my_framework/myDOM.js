@@ -100,7 +100,7 @@ export class MyDOM {
    * @param {Component} parent 
    */
   static getFamily(parent){
-    return new MyDOM().family.get(parent?.key)
+    return new MyDOM().family.get(parent.key)
   }
 
   /**
