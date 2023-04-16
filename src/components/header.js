@@ -1,8 +1,8 @@
 //componente de prueva
-import { Component } from "../lib/my_framework/component.js";
+import { MyComponent } from "../lib/my_framework/component.js";
 import { Card } from "./card";
 
-export class Header extends Component{
+export class Header extends MyComponent{
 
   constructor(){
     super('header-page',{

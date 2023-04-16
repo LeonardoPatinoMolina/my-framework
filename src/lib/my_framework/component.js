@@ -7,7 +7,7 @@ import { MyDOM } from "./myDOM.js";
 /**
  * @class
 */
-export class Component {
+export class MyComponent {
 
   /** flag que determina si el componente se encuentra
    * o no, previamnte inicializado
@@ -32,16 +32,6 @@ export class Component {
    */
   #previusState;
 
-  /** Propiedades del componente dispuestas
-   * representan los datos que son inyectados desde el constructor
-   * @type {any}
-   */
-  props;
-  /** Estado del componente, consiste en una serie
-   * de datos con la capacidad de persistir entre re renderizados.
-   * @type {any}
-   */
-  state;
   /** Stores de datos a las cuales se encuentra subscrito el componente,
    * representan el estado global de la app e igualmente 
    * cuentan con la capacidad de persistir entre re renderizados.
@@ -64,6 +54,18 @@ export class Component {
    */
   #inputController = new InputController(this);
 
+  /** Propiedades del componente dispuestas
+   * representan los datos que son inyectados desde el constructor
+   * @type {any}
+   */
+  props;
+  
+  /** Estado del componente, consiste en una serie
+   * de datos con la capacidad de persistir entre re renderizados.
+   * @type {any}
+   */
+  state;
+
   /** Atributo encargado de subscribir lógica al ciclo de
    * vida del componente
    * @type {Life}
@@ -76,7 +78,7 @@ export class Component {
   body;
   
   /**
-   * @type {Component}
+   * @type {MyComponent}
    */
   parent;
 
@@ -139,8 +141,8 @@ export class Component {
    * Metodo encargado de realizar un acoplamiento de componentes
    * en lote, esto reduce las manipulaciones de DOM de 1-N a 1
    * por acople
-   * @param {function(new:Component, {})} ClassComponent 
-   * @param {Component} parent 
+   * @param {function(new:MyComponent, {})} ClassComponent 
+   * @param {MyComponent} parent 
    * @param {Array<any>} dataBuilder 
    */
   static attachMany(ClassComponent, parent, dataBuilder){
@@ -286,7 +288,7 @@ export class Component {
 
   /**
    * Encargada de acoplar el componente hijo al padre y retornar una raíz para futuro renderizado
-   * @param {Component} parent
+   * @param {MyComponent} parent
    * @returns {string}
    */
   attach(parent){

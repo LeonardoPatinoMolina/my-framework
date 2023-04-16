@@ -1,5 +1,5 @@
 "use strict"
-import { Component } from "./component.js";
+import { MyComponent } from "./component.js";
 import { MyDOM } from "./myDOM.js";
 
 export class MyRouter {
@@ -9,7 +9,7 @@ export class MyRouter {
   static instanceRouter;
 
   /**
-   * @type {Component}
+   * @type {MyComponent}
    */
   currentPage;
   /**
@@ -17,17 +17,17 @@ export class MyRouter {
    */
   #routes = new Map()
   /**
-   * @type {Map<string, typeof Component>}
+   * @type {Map<string, typeof MyComponent>}
    */
   pages;
 
   /**
-   * @type {typeof Component}
+   * @type {typeof MyComponent}
    */
   #notFound;
 
   /**
-   * @param {{pages: Map<string, typeof Component>, notFound: typeof Component}=} args 
+   * @param {{pages: Map<string, typeof MyComponent>, notFound: typeof MyComponent}=} args 
    */
   constructor(args){
     if(!!MyRouter.instanceRouter){
@@ -69,7 +69,7 @@ export class MyRouter {
   #renderRoute(){
     const path = window.location.pathname;
     /**
-     *@type {typeof Component}
+     *@type {typeof MyComponent}
      */
     const page = this.pages.get(path) ?? this.#notFound; 
     

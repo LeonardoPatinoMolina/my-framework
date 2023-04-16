@@ -5,7 +5,7 @@ El presente ejercicio es una continuación de uno anterior llamado __[Mi pequeñ
 > Mi única omisión a la regla de no usar dependeencias para el framework fue incluir __Vite__ para la creación de la versión ``build`` minificada, vite es una herramienta muy cómoda y poderosa :). Por otro lado estoy usando un archivo de configuración de typescript para usar su linter, es otra herramienta espectacular jeje.
 
 ## __Contenido__
-El contenido que documenta el presente proyecto no comprende cada aspecto de la implementación y estructura en profundidad de las más de __1200__ líneas de código que fueron necesarias para su realización, se limíta a documentar los aspectos fundamentales y necesarios para su uso y correcto funcionamiento, de suyo sea que los diagramas mostrarán algunas clases que no cuentan con secciones que las desglosen de froma concreta en el contenido.
+El contenido que documenta el presente proyecto no comprende cada aspecto de la implementación y estructura en profundidad de las más de __1200__ líneas de código que fueron necesarias para su realización, se limíta a documentar los aspectos fundamentales y necesarios para su uso y correcto funcionamiento, de suyo sea que los diagramas mostrarán algunos atributos y métodos que no son tratadas de froma concreta en el presente documento.
 
 - [Puntos de corrección](#puntos-de-correción)
 - [Diagrama de clases](#diagrama-de-clases)

@@ -1,4 +1,4 @@
-import { Component } from "./component.js";
+import { MyComponent } from "./component.js";
   /**
    * @typedef {{[x: string]: (data: any, payload: any)=>void}} Reducer
    * @typedef {(payload: any)=>void} Action
@@ -15,7 +15,7 @@ export class MyGlobalStore {
    */
   store = new Map();
   /**
-   * @type {Map<string, Set<Component>>}
+   * @type {Map<string, Set<MyComponent>>}
    */
   observers = new Map();
 
@@ -55,7 +55,7 @@ export class MyGlobalStore {
   /**
    * Método que subscribe componentes al store global
    * @param {string} shelfName 
-   * @param {Component} observer 
+   * @param {MyComponent} observer 
    */
   static subscribe(shelfName, observer){
     const gStore = new MyGlobalStore();

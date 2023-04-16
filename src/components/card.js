@@ -1,8 +1,8 @@
 //componente de prueva
-import { Component } from "../lib/my_framework/component.js";
+import { MyComponent } from "../lib/my_framework/component.js";
 import { MyDOM } from "../lib/my_framework/myDOM";
 
-export class Card extends Component{
+export class Card extends MyComponent{
 
   init(){
     this.state = {

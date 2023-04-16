@@ -1,7 +1,7 @@
-import { Component } from "../lib/my_framework/component.js";
+import { MyComponent } from "../lib/my_framework/component.js";
 import { MyRouter } from "../lib/my_framework/router";
 
-export class Result extends Component{
+export class Result extends MyComponent{
   constructor(){
     super('result-page');
   }

@@ -1,4 +1,4 @@
-import { Component } from "./component.js";
+import { MyComponent } from "./component.js";
 
 /**
  * @class EventController
@@ -11,7 +11,7 @@ export class EventController{
    * @typedef {{capture?: boolean, passive?: boolean, once?: boolean}} Config
    */
   /** componente propieatario del presente controlador
-   * @type {Component}
+   * @type {MyComponent}
    */
   #owner;
   /** Variable auxiliar para evitar sobrecarga de eventos
@@ -31,7 +31,7 @@ export class EventController{
   #eventHandlers = new Map();
 
   /**
-   * @param {Component} owner 
+   * @param {MyComponent} owner 
    */
   constructor(owner){
     this.#owner = owner;

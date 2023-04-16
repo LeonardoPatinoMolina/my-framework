@@ -1,4 +1,4 @@
-import { Component } from "./component.js";
+import { MyComponent } from "./component.js";
 
 export class Life {
 
@@ -11,7 +11,7 @@ export class Life {
   /** Componente poseedor de la instancia Life
    * al cual se realiza el seguimiento de su 
    * ciclo de vida
-   * @type {Component}
+   * @type {MyComponent}
    */
   #owner;
 
@@ -25,7 +25,7 @@ export class Life {
   #effects = [];
 
   /**
-   * @param {Component} owner
+   * @param {MyComponent} owner
    */
   constructor(owner){
     this.#owner = owner;

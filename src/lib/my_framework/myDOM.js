@@ -1,5 +1,5 @@
 "use strict"
-import { Component } from "./component.js";
+import { MyComponent } from "./component.js";
 
 export class MyDOM {
   /**
@@ -14,7 +14,7 @@ export class MyDOM {
   family = new Map();
 
   /**
-   * @type {Map<string, Component>}
+   * @type {Map<string, MyComponent>}
    */
   nodes = new Map();
   /** raíz del dom
@@ -39,7 +39,7 @@ export class MyDOM {
     new MyDOM(root);
     return {
       /**
-       * @param {Component} component 
+       * @param {MyComponent} component 
        */
       render: (component)=>{
         component.render(root);
@@ -59,14 +59,14 @@ export class MyDOM {
    * Obtiene un componente almacenado en los nodos del
    * arbol
    * @param {string} key 
-   * @returns {Component}
+   * @returns {MyComponent}
    */
   static getMember(key){
     return new MyDOM().nodes.get(key)
   }
 
   /** Inicialza una familia en el arbol
-   * @param {Component} parent
+   * @param {MyComponent} parent
    */
   static initFamily(parent){
     const family = new MyDOM().family.set(parent.key, new Set());
@@ -75,8 +75,8 @@ export class MyDOM {
 
   /**
    * Añade un nuevo hijo al atributo family del arbol
-   * @param {Component} parent 
-   * @param {Component} child 
+   * @param {MyComponent} parent 
+   * @param {MyComponent} child 
   */
  static setChild(parent, child){
    let family = MyDOM.getFamily(parent);
@@ -85,8 +85,8 @@ export class MyDOM {
   
   /**
    * Remueve un hijo al atributo family del arbol
-   * @param {Component} parent 
-   * @param {Component} child 
+   * @param {MyComponent} parent 
+   * @param {MyComponent} child 
    */
   static removeChild(parent, child){
     const family = new MyDOM().family.get(parent.key);
@@ -97,14 +97,14 @@ export class MyDOM {
 
   /**
    * Obtiene un Set con todos los hijos del actual componente
-   * @param {Component} parent 
+   * @param {MyComponent} parent 
    */
   static getFamily(parent){
     return new MyDOM().family.get(parent.key)
   }
 
   /**
-   * @param {Component} parent
+   * @param {MyComponent} parent
    */
   static removeFamily(parent){
     const dom = new MyDOM();
@@ -112,7 +112,7 @@ export class MyDOM {
   }
 
     /** Añade un nuevo nodo al arbol
-   * @param {Component} newMember
+   * @param {MyComponent} newMember
    * @returns {boolean} retorna true si se ñadió de forma adecuada
    * y false si no se añadíó correctamente
    */
@@ -124,7 +124,7 @@ export class MyDOM {
   }
 
   /**
-   * @param {Component} targetMember 
+   * @param {MyComponent} targetMember 
    * @returns {boolean}
    */
   static removeMember(targetMember){
@@ -136,7 +136,7 @@ export class MyDOM {
   /**
    * Verifica si el actual componente existe como 
    * miembro del árbol
-   * @param {Component} member 
+   * @param {MyComponent} member 
    */
   static memberCompare(member){
     const dom = new MyDOM();

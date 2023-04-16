@@ -1,4 +1,4 @@
-import { createShelf } from "../../lib/my_framework/GlobalStore.js";
+import { createShelf } from "../../lib/my_framework/globalStore.js";
 
 export const userShef = createShelf({
   name: 'user',

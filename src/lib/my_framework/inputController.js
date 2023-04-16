@@ -1,4 +1,4 @@
-import { Component } from "./component.js";
+import { MyComponent } from "./component.js";
 
 export class InputController {
   /**
@@ -6,7 +6,7 @@ export class InputController {
    */
 
   /** componente propieatario del presente controlador
-   * @type {Component}
+   * @type {MyComponent}
    */
   #owner;
   
@@ -26,7 +26,7 @@ export class InputController {
   #counterKeyController = 0;
 
   /**
-   * @param {Component} owner 
+   * @param {MyComponent} owner 
    */
   constructor(owner){
     this.#owner = owner;
