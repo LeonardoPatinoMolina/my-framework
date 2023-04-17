@@ -10,6 +10,12 @@ export class InputController {
    */
   #owner;
   
+  /** Variable auxiliar para evitar sobrecarga de controladores
+   * y llevar el conteo de las keys
+   * @type {number}
+   */
+  #counterKeyController = 0;
+  
   /**
    * @type {Map<string, AbortController>}
    */
@@ -19,11 +25,6 @@ export class InputController {
    * @type {Map<string, Controller>}
    */
   #inputcontrollers = new Map();
-  /** Variable auxiliar para evitar sobrecarga de controladores
-   * y llevar el conteo de las keys
-   * @type {number}
-   */
-  #counterKeyController = 0;
 
   /**
    * @param {MyComponent} owner 

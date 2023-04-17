@@ -11,8 +11,8 @@ El presente ejercicio es una continuación de uno anterior llamado __[Mi pequeñ
 ## __Contenido__
 El contenido que documenta el presente proyecto no comprende cada aspecto de la implementación y estructura en profundidad de las más de __1200__ líneas de código que fueron necesarias para su realización, se limíta a documentar los aspectos fundamentales y necesarios para su uso y correcto funcionamiento, de suyo sea que los diagramas mostrarán algunos atributos y métodos que no son tratadas de forma concreta en el presente documento.
 
-- [Puntos de corrección](#puntos-de-correción)
 - [Diagrama de clases](#diagrama-de-clases)
+- [Puntos de corrección](#puntos-de-correción)
 - [Tecnologías](#tecnologías)
 - [Entrada de la app](#entrada-de-la-app)
 - [Componentes](#componentes)
@@ -29,7 +29,17 @@ El contenido que documenta el presente proyecto no comprende cada aspecto de la 
 - [Concluciones](#myrouter)
 
 ## __Diagrama de clases__
-en proceso...
+Este sencillo diagrama da cuenta de la composición general de las clases que participan del funcionamiento interno de my framework, de zquierda a derecha:
+- Las clases __InputController__, __EventController__ y __LifeComponent__ componen a la clase __MyComponent__, esto significa que ellas solo cumplen funciones en la existencia de una instancia de la clase MyComponent, de allí que todas compartan un atributo _owner_ el cual refiere su instancia propietaria y a su véz, estas son incluidas en atributos de la clase _MyComponent_.
+- La clase __MyComponent__ mantiene una elación de agregación con la clase __MyDOM__, esta última se encarga de administrar y organizar todas las instancias de la primera, y a su véz determina su presencia en tiempo de ejecución.
+- En la parte inferior la clase __MyShelf__ compone a la clase __MyGlobalStore__, esto significa que las funciones de la primera están subordinadas a la segunda, y sus instancias están contenidas en uno de los atributos de la clase __MyGlobalStore__; esta se relaciona con la clase __MyComponent__ en un orden de mediador observador, es aquí donde está implementado el patrón mediador de eventos que los involucra, más adelante se darán más detalles al respecto.
+- La clase __MyRouter__ guarda una relación con la clase __MyComponent__ y la clase __MyDOM__, esto debido a que sus funciones involucran la manipulación directa del renderizado de árboles de componentes.
+- La clase MyDOM no posee ningún atributo o método privado, esto debido a que son mayoritariamente estaticos, esta clase no está diseñada para instanciarse con regularidad.
+<p align="center">
+  <img src="https://i.postimg.cc/jSCDhkH0/clases-myf.png" width="90%" height="auto" alt="my framework logo" title="my framework logo">
+</p>
+
+<hr>
 
 ## __Puntos de Correción__
 

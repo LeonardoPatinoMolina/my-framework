@@ -9,22 +9,24 @@ export class MyRouter {
   static instanceRouter;
 
   /**
+   * @type {Map<string, string[]>}
+  */
+ #routes = new Map()
+ 
+ /**
+  * @type {typeof MyComponent}
+  */
+  #notFound;
+
+  /**
    * @type {MyComponent}
    */
   currentPage;
-  /**
-   * @type {Map<string, string[]>}
-   */
-  #routes = new Map()
+
   /**
    * @type {Map<string, typeof MyComponent>}
    */
   pages;
-
-  /**
-   * @type {typeof MyComponent}
-   */
-  #notFound;
 
   /**
    * @param {{pages: Map<string, typeof MyComponent>, notFound: typeof MyComponent}=} args 
