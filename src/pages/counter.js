@@ -3,13 +3,12 @@ import { MyRouter } from "../lib/my_framework/router";
 
 export class Counter extends MyComponent{
   constructor(){
-    super('counter-page');
+    super('counter-page');//key
   }
 
   init(){
     this.state = {
       count: 0,
-      text: '',
     };
     
   }
@@ -18,24 +17,33 @@ export class Counter extends MyComponent{
     const addCount = ()=>{
       this.update(()=>{
         this.state.count += 1;
-      })
-    }
-
-    const upd = (e)=>{
-      this.update(()=>{
-        this.state.text = e.target.value
-      })
+      });
     }
 
     return super.template((_)=>`
-    <main id="con" class="container container2" >
-      <h2 class="titulo">Mi Contador</h2>
-      <img class="imagen-jopo" src="https://i.pravatar.cc/150?u=jopo">
-      <p>${this.state.count} + 10</p>
-      <button class="botonA" style="margin-bottom: 1rem;" ${_.on('click', addCount)}>add</button>
-      <button class="botonB" ${_.on('click', ()=>{MyRouter.go(`/resultado/{${this.state.count + 10}}`)})}>Watch de result</button>
-      <br>
-      <input type="text" ${_.inputController(upd)} value="${this.state.text}">
+    <main id="con" class="container" >
+      <h1 class="titulo">Mi Contador</h2>
+      <p align="center">
+      <img 
+        draggable="false" 
+        class="image" 
+        src="https://i.postimg.cc/sgBh0yHV/my-frame-icon.png" 
+        width="auto" 
+        height="200px" 
+        alt="my framework logo" 
+        title="my framework logo"
+      >
+    </p>
+      <p class="number">${this.state.count} <span>+ 10</span></p>
+      <button
+        class="btn_neumorfus" 
+        style="margin-bottom: 1rem;" 
+        ${_.on('click', addCount)}
+      >Añadir</button>
+      <button 
+        class="btn_neumorfus" 
+        ${_.on('click', ()=>{MyRouter.go(`/result/{${this.state.count + 10}}`)})}
+      >Ver resultado</button>
     </main>
     `);
   }

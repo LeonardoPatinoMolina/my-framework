@@ -16,9 +16,21 @@ export class Result extends MyComponent{
   build(){
     return super.template((_)=>`
     <main>
-      <h2>resultado</h2>
-      <p>El resultado es ${this.state.result}</p>
-      <button ${_.on('click', ()=>{MyRouter.back()})}>Go back</button>
+      <h1>Mi Resultado</h1>
+      <p class="number">${this.state.result}</p>
+      <p align="center">
+        <img 
+          draggable="false" 
+          class="image_2" 
+          src="https://i.postimg.cc/sgBh0yHV/my-frame-icon.png" 
+          width="auto" 
+          height="200px" 
+          alt="my framework logo" 
+          title="my framework logo"
+        >
+      </p>
+      <p class="info">todo lo que debes saber en este <a href="https://github.com/LeonardoPatinoMolina/my-framework" target="_blank">enlace</a></p>
+      <button class="btn_neumorfus" ${_.on('click', ()=>{MyRouter.back()})}>Volver</button>
     </main>
     `);
   }

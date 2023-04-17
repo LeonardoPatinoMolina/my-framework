@@ -1,11 +1,15 @@
 # __My Framework 2.0__
 
+<p align="center">
+  <img src="https://i.postimg.cc/sgBh0yHV/my-frame-icon.png" width="300px" height="auto" alt="my framework logo" title="my framework logo">
+</p>
+
 El presente ejercicio es una continuación de uno anterior llamado __[Mi pequeño framework font-end](https://github.com/LeonardoPatinoMolina/my-peque-o-framework)__, en el cual me propuse crear un framework front-end de _javascript_ desde los cimientos sin dependecias de terceros; en esta ocasión tengo el mismo propósito, pero planeo reducir la complejidad de su uso, eliminando muchas restricciones y limitaciones, haciéndolo más rápido y consistente.
 
-> Mi única omisión a la regla de no usar dependeencias para el framework fue incluir __Vite__ para la creación de la versión ``build`` minificada, vite es una herramienta muy cómoda y poderosa :). Por otro lado estoy usando un archivo de configuración de typescript para usar su linter, es otra herramienta espectacular jeje.
+> Mi única omisión a la regla de no usar dependencias para el framework fue incluir __Vite__ para la creación de la versión ``build`` minificada, vite es una herramienta muy cómoda y poderosa :). Por otro lado estoy usando un archivo de configuración de typescript para usar su linter, es otra herramienta espectacular.
 
 ## __Contenido__
-El contenido que documenta el presente proyecto no comprende cada aspecto de la implementación y estructura en profundidad de las más de __1200__ líneas de código que fueron necesarias para su realización, se limíta a documentar los aspectos fundamentales y necesarios para su uso y correcto funcionamiento, de suyo sea que los diagramas mostrarán algunos atributos y métodos que no son tratadas de froma concreta en el presente documento.
+El contenido que documenta el presente proyecto no comprende cada aspecto de la implementación y estructura en profundidad de las más de __1200__ líneas de código que fueron necesarias para su realización, se limíta a documentar los aspectos fundamentales y necesarios para su uso y correcto funcionamiento, de suyo sea que los diagramas mostrarán algunos atributos y métodos que no son tratadas de forma concreta en el presente documento.
 
 - [Puntos de corrección](#puntos-de-correción)
 - [Diagrama de clases](#diagrama-de-clases)
@@ -43,7 +47,7 @@ en proceso...
 <hr>
 
 ## __Tecnologías__
-Las tecnologías empleadas son __HTML 5__ y __Javascrit ES6__, los estilos no son objeto de interés para el presente ejercicio, solamente la estructura y manipulación de la interfaz; al contar con html para el maquetado, puede aplicarse cualquiera de los estilizados que este admita: __CSS__, __SASS__, etc. en este caso particular me decanto por __SCSS__ por razones prácticas y de preferencia personal, esta es un dependencia de terceros pero no está involucrada para nada con el framework.
+Las tecnologías empleadas son __HTML 5__ y __Javascrit ES6__, los estilos no son objeto de interés para el presente ejercicio, solamente la estructura y manipulación de la interfaz; al contar con html para el maquetado, puede aplicarse cualquiera de los estilizados que este admita: __CSS__, __SASS__, etc.
 
 <hr>
 

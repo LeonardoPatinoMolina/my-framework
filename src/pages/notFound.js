@@ -1,7 +1,7 @@
-import { Component } from "../lib/my_framework/component.js";
+import { MyComponent } from "../lib/my_framework/component.js";
 import { MyRouter } from "../lib/my_framework/router";
 
-export class NotFound extends Component{
+export class NotFound extends MyComponent{
   constructor(){
     super('nor-found')
   }
