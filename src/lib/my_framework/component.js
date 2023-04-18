@@ -346,9 +346,7 @@ export class MyComponent {
        * ha sido desrenderizado por ende podemos removerlo del 
        * arbol
        */
-      MyDOM.removeFamily(this);
-      MyDOM.removeChild(this.parent, this);
-      MyDOM.removeMember(this);
+      this.clear();
       return;
     };
     const fragment = new DocumentFragment();
@@ -387,5 +385,8 @@ export class MyComponent {
       const child = MyDOM.getMember(childKey)
       child.clear();
     })//end foreach
+    MyDOM.removeFamily(this);
+    MyDOM.removeChild(this.parent, this);
+    MyDOM.removeMember(this);
   }// end clear
 }

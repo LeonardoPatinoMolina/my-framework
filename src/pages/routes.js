@@ -1,7 +1,8 @@
 import { Counter } from "./counter.js";
+import { Prueva } from "./prueva";
 import { Result } from "./result";
 
 export const PAGES = new Map([
-  [ "/", Counter],
+  [ "/", Prueva],
   ["/result/:result", Result],
 ]);
