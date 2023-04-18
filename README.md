@@ -49,9 +49,9 @@ Este sencillo diagrama da cuenta de la composición general de las clases que pa
 |---|---|---|
 |__Asíncronía__| no está manejada de la mejor forma, los componentes no puedes renderizarse sin antes haber culminado sus tareas asíncronas, las cuales estan acopladas al proceso de renderizado.| las tareas asíncronas han sido desacopladas del proceso de renderizado y migradas a métodos sobreescritos y un atributo auxiliar para manejarlas más directamente|
 |__Ciclo de vida__| una preocupación demasiado relevante a la hora de añadir lógica, tanto así que es necesario implementar _dos_ métodos distintos para ello, duplicando el trabajo y las posibilidades de error.| ha sido centralizado en el funcionamiento de un atributo __$__ el cual es capaz de ejecutar lógica reactiva, esta característica sería análoga a useEffect de __React.js__.|
-|__Renderizado condicional__| prácticamente inexistente,cualquier intento de renderizar condicionalmente el componente es realizado al margen de las carácteisticas propias del framwork, en otras palabras, no es un caso contemplado dentro del mismo.|todos los componentes tienen la capacidad de renderizarse en cualquier momento que se demande, incluso pueden hacerlo por lotes; la única desventaja respecto a _mi pequeño framework_ es que resulta necesario que cada componte posea un __key__ única, de lo contrario su comportamiento no será el esperado.
-|__Estado__| es un _pseudoestado_ difícil de manipular, en realidad se trata de una forma de inyectar nuevas _props_ esperando que eso actualize la vista debido al acoplamiento del proceso de renderizado a la inyección de _props_| existe un método explicito para actualizar el estado del componente, este funciona de forma similar al método __setState()__ de los _StateFulWidget_ de __Flutter__, el cual evalua si hubo algun cambio en el estado del componente y lo re renderiza en consecuencia, en caso de no hallar cambios, simplemente ignora su invocación.
-|__Enrutamiento__| esto es algo de lo que decidí prescindir, debido a que no tenía los conocimientos adecuados para ello, es decir, mi pequeño framework no posee un enrutamiento real, solo simula el cambio de página renderizando árboles de componentes independiendes.| cuenta con un sistema de enrutamiento sensillo capaz de renderizar páginas de forma satisfactoria y añadir estados al historial de navegación, en otras palabras, en esta ocació sí es un enrutamiento real del lado del cliente, el cual está acoplado a la raíz que se determine como el nodo pivote de la __SPA__.
+|__Renderizado condicional__| prácticamente inexistente,cualquier intento de renderizar condicionalmente el componente es realizado al margen de las carácteisticas propias del framework, en otras palabras, no es un caso contemplado dentro del mismo.|todos los componentes tienen la capacidad de renderizarse en cualquier momento que se demande, incluso pueden hacerlo por lotes; la única desventaja respecto a _mi pequeño framework_ es que es necesario que cada componte posea un __key__ única, de lo contrario su comportamiento no será el esperado.
+|__Estado__| es un _pseudoestado_ difícil de manipular, en realidad se trata de una forma de inyectar nuevas _props_ esperando que eso actualize la vista debido al acoplamiento del proceso de renderizado a la inyección de _props_| Existe un método explicito para actualizar el estado del componente, este funciona de forma similar al método __setState()__ de los _StateFulWidget_ de __Flutter__, el cual evalua si hubo algún cambio en el estado del componente y lo re renderiza en consecuencia, en caso de no hallar cambios, simplemente ignora su invocación.
+|__Enrutamiento__| esto es algo de lo que decidí prescindir, debido a que no tenía los conocimientos adecuados para ello, es decir, mi pequeño framework no posee un enrutamiento real, solo simula el cambio de página renderizando árboles de componentes independiendes.| cuenta con un sistema de enrutamiento sensillo capaz de renderizar páginas de forma satisfactoria y añadir estados al historial de navegación, en otras palabras, en esta ocación sí es un enrutamiento real del lado del cliente, el cual está acoplado a la raíz que se determine como el nodo pivote de la __SPA__.
 
 > __Nota__: No pretendo afirmar que he perfeccionado la técnica, pero definitivamente lo concidero una mejora :)
 
@@ -117,6 +117,14 @@ Inmediatamente se puede apreciar que se trata de un __componente de clase__, efe
 
 En este caso tenemos un clásico contador, gracias a este ejemplo tan típico tengo espacio para exponer rápidamente la existencia del estado, este es un dato que persiste entre re renderizados, pero no no persiste ante desrenderizados, ya llegaremos allá.
 
+La __key__ en los compomnentes que serán páginas en el enrutador deben estar explicitas en el constructor, ya que es requisito obligatorio para el funcionamiento interno de my framework, los componentes page deben tener este constructor sin parámetros tal y como se ve en el ejemplo anterior:
+~~~Javascript
+  constructor(){
+    super('home-page'); //key
+  }
+~~~
+
+
 ### __Component__
 La clase cuenta con __diez 10__ atributos públicos que tendremos a nuestra disposición para diversar operaciones, son los siguientes:
 
@@ -142,7 +150,6 @@ Ahora pasamos a los métodos, la clase Component sin contar el método contructo
 - __attach(parent)__: método encargado de acoplar el componente al cuerpo de otro componente, estableciendo así una relación de padre e hijo, recibe como parámetro la instancia del componente padre. este método retorna un string que corresponde a su nodo raíz, esto implica que preferiblemente sea invocado dentro de la plantilla literal de su componente padre.
 - __(para sobreescritura) build(props, state, global)__: método destinado a ser sobre escrito, recibe como primer parámetro las props del componente, como segundo el estado local y como tercero el store global al cual está subscrito el componente, estos parámetros son opcionales. El propósito del método es construir la _plantilla_ del componente, esta tarea la ejecuta en conjunto con el siguiente método _template(c)_, adicionalmente es un scope para ejecutar _lógica previa_ al ensamble del nodo final del componente. debe retornar el método _template(c)_.
 - __template(callback)__: método encargado de adminstrar la plantilla literal donde reza la sintaxis del nodo del componente, recive como parámetro una ```función callback``` la cual retorna la plantilla literal, esta recibe como parámetro un objeto ````controlador```` encargado de proveer funciones para definir eventos en línea y <em>manejadores de campos de formulario</em>, más adelante mostraré casos practicos de esta estructura tan peculiar, aunque ya en el ejemplo del contador se pudo ver una muestra de esta caracterísctica.
-
 
 #### __Opcionales__
 - __(para sobreescritura) init()__: método destinado a ser sobre escrito, no tiene parámetros, su función es muy puntual: proveer un espacio para inicalizar el estado del componente, tanto local como global, esté metodo se ejecuta automáticamente al inicializar el componente, lo cual lo hace idóneo para esta tarea.
