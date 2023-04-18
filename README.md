@@ -1,10 +1,10 @@
-# __My Framework 2.0__
+# __My Framework__
 
 <p align="center">
   <img src="https://i.postimg.cc/sgBh0yHV/my-frame-icon.png" width="300px" height="auto" alt="my framework logo" title="my framework logo">
 </p>
 
-El presente ejercicio es una continuación de uno anterior llamado __[Mi pequeño framework font-end](https://github.com/LeonardoPatinoMolina/my-peque-o-framework)__, en el cual me propuse crear un framework front-end de _javascript_ desde los cimientos sin dependecias de terceros; en esta ocasión tengo el mismo propósito, pero planeo reducir la complejidad de su uso, eliminando muchas restricciones y limitaciones, haciéndolo más rápido y consistente.
+El presente ejercicio es una continuación de uno anterior llamado __[Mi pequeño framework font-end](https://github.com/LeonardoPatinoMolina/my-peque-o-framework)__, en el cual me propuse crear un framework front-end de _javascript_ desde los cimientos sin dependecias de terceros; en esta ocasión tengo el mismo propósito, pero planeo reducir la complejidad de su uso, eliminando muchas restricciones y limitaciones, haciéndolo más rápido y consistente. Este framework está fuertemente influenciado por __React.js__ debido a que es la tecnología con la que más he interactuado desde apróximadamente un año que inicié mi formación en el desarrollo web, por esta razón estaré realizando constantes comparaciones entre __my framework__ y __React.js__ en su mayoría con fines explicativos.
 
 > Mi única omisión a la regla de no usar dependencias para el framework fue incluir __Vite__ para la creación de la versión ``build`` minificada, vite es una herramienta muy cómoda y poderosa :). Por otro lado estoy usando un archivo de configuración de typescript para usar su linter, es otra herramienta espectacular.
 
@@ -26,6 +26,7 @@ El contenido que documenta el presente proyecto no comprende cada aspecto de la 
 - [MyGlobalStore](#myglobalstore)
   - [MyShelf](#myshelf)
 - [MyRouter](#myrouter)
+- [Instalación y ejecución](#instalación-y-ejecución)
 - [Concluciones](#myrouter)
 
 ## __Diagrama de clases__
@@ -82,11 +83,11 @@ La clase __MyDom__ es una especie de "virtual dom" que nos porevee una serie de 
 Los componentes son fragmentos o maquetas que nos permiten componer las vistas de forma modular, cada uno de ellos se responsabiliza de su diseño y lógica intrínseca, de esta forma podemos modularizar nuestro código haciéndo más amena la experiencia de desarrollo, en el presente framework estos se basan en plantillas literales que siguen un par de reglas para poder transformarse en código html entendible para el navegador, poseen la siguiente sintaxis:
 ~~~Javascript
 "use strict"
-import { Component } from "../lib/my_framework/component.js";
+import { MyComponent } from "../lib/my_framework/component.js";
 
-export class Counter extends Component{
+export class Counter extends MyComponent{
   constructor(){
-    super('home-page');
+    super('home-page'); //key
   }
 
   init(){
@@ -314,7 +315,7 @@ Este es provablemente el hallazgo más gratificante que realicé durante el desa
 ### __EventController(name, callback, config)__
 Esta es  una característica que hace posible asignar un evento en la plantilla del componente asignando un manejador, podemos asumir que se trata de un ``addEventListener()`` especializado para funcionar en las plantillas de my framework, este cuenta con __tres__ parámetros:
 
-- __name__: refiere al nombre del evento, los eventos que pueden ser asignados son exactamente los mismos que añadirías cn un _addEventListener()_ de toda la vida.
+- __name__: refiere al nombre del evento, los eventos que pueden ser asignados, son exactamente los mismos que añadirías en un _addEventListener()_ de toda la vida.
 - __callback__: refiere al manejador del evento, es quella unción que será ejecutada en cada ocación que el evento se dispare, recibiendo como parámetro el evento.
 - __config__: este es un objeto de configuración análogo al objeto de configuración de un addEventListener y de igual forma es opcional, posee todos los atributos del mismo a excepción del atributo ``signal`` el cual se recerba para funciones internas del framework, repasando las opciones a configurar tenemos:
 ~~~Typescript
@@ -326,7 +327,7 @@ Esta es  una característica que hace posible asignar un evento en la plantilla 
 ~~~
 >``Nota:`` No me detendré a explicar qué hace cada uno, porque esto no es algo de my framework, es una funcionalidad propia del método __addEventListener()__ de la clase Element en __Javascript__ 
 
-Podemos ver en acción esta carácteristica de mi famework en el siguiente método _build()_ del componente Counter del ejemplo anterior:
+Podemos ver en acción esta carácteristica de my framework en el siguiente método _build()_ del componente Counter del ejemplo anterior:
 ~~~Javascript
       build(){
         const addCount = ()=>{
@@ -370,7 +371,7 @@ Esta situación acarrea una serie de problemas con arreglo a la experiencia del 
 
 >``Nota:`` Me recerbo los detalles internos de su implementaición, tiene a su disposición el código empleado para ello.
 
-La solución consistió en una combinación del resguardo de: datos ingresados, posición del cursor y estado de foco del campo involurado. la sintaxis final resultó ser sensilla. Antes de recurrir a un ejemplo de mi faramework veamos como es un ``formulario controlado`` en una biblioteca de componentes reactivos como __React.js__:
+La solución consistió en una combinación del resguardo de: datos ingresados, posición del cursor y estado de foco del campo involurado. la sintaxis final resultó ser sensilla. Antes de recurrir a un ejemplo de my farmework veamos como es un ``formulario controlado`` en una biblioteca de componentes reactivos como __React.js__:
 
 ~~~Javascript
 "use strict"
@@ -422,9 +423,9 @@ Ahora veamos este mismo ejemplo, pero en un componemte de my framework:
 
 ~~~Javascript
 "use strict"
-import { Component } from "../lib/my_framework/component.js";
+import { MyComponent } from "../lib/my_framework/component.js";
 
-export class Form extends Component{
+export class Form extends MyComponent{
   constructor(){
     super('form');
   }
@@ -476,7 +477,7 @@ export class Form extends Component{
   }
 }
 ~~~
-En este ejemplo vemos exactamente la misma situación que con el componente Form de _React.js_, pero con toda las reglas de my framework y sus métodos. La sintaxis es semejante a un __eventController()__, pero no podemos afirmar que se trata de un __addEventListener__, este es un controlador específico para etiquetas de entrada de teclado, lo cual inlcuye:
+En este ejemplo vemos exactamente la misma situación que con el componente Form de _React.js_, pero con toda las reglas de my framework y sus métodos. La sintaxis es semejante a un __eventController()__, pero no podemos afirmar que se trata de un __addEventListener__, este es un controlador específico para etiquetas de entrada de teclado, lo cual incluye:
 ~~~html
 <input type="text">
 <input type="number">
@@ -487,11 +488,10 @@ En este ejemplo vemos exactamente la misma situación que con el componente Form
 <input type="password">
 <textarea></textarea>
 ~~~
-> ``Importante:`` como una excepción tenemos el __\<input type="range">__, para controlar este input puede optar por el eventController() y manejar el _value_ con el evento input. El input controller no funcionará adecuadamente y padecerá comportamientos inesperados. El resto de etiquetas input como checkbox o radio, etc.. pueden manejarse con eventos comunes, no hacen parte del problema que dio origen al inputController, solo las previamnte señaladas.
 
 Y al ser tan especializado, no ocupa nombrar algún evento, basta con administrarle el callback o manejador que recibirá el evento y se ejecutará al momento que se dispare.
 
-
+> ``Importante:`` evidentemente no están contempladas todas las etiquetas __input__, debido a que solo las previamente señaladas originaron la necesidad de esta solución tan específica; para controlar el resto de etiquetas _input_ como checkbox o radio, etc.. puede optar por el __eventController()__ y manejar su valor con el evento que corresponda, en esos casos el _inputController_ no funcionará adecuadamente y sufrirá comportamientos inesperados.
 
 <hr>
 
@@ -677,7 +677,7 @@ const router = new MyRouter({
 
 ///pages/routes.js
 import { Counter } from "./counter.js";
-import { NotFound } from "../components/notFound";
+import { NotFound } from "./notFound";
 import { Result } from "./result";
 
 export const PAGES = new Map([
@@ -754,12 +754,12 @@ Aquí otra regla, al ser varios params igual deben estar precedidos por una barr
 Para la obtención de los params en el cuerpo de la página, el cual no es más que la clase del componente raíz, damos uso del método __params()__, siguiendo con el ejemplo anterior donde navegamos a una página con nombre de ruta ``"product/:code/:price"``, la forma de obtener los datos es la siguiente:
 
 ~~~Javascript
-import { Component } from "../lib/my_framework/component.js";
+import { MyComponent } from "../lib/my_framework/component.js";
 import { MyRouter } from "../lib/my_framework/router";
 
-export class Product extends Component{
+export class Product extends MyComponent{
   constructor(){
-    super('product-page');
+    super('product-page'); //key
   }
 
   init(){
@@ -785,5 +785,57 @@ export class Product extends Component{
 
 Fácilmente contamos con un componente que invoca al método __MyRouter.params()__ desde su método ``init()``, posteriormente lo almacena en su estado local y lo imprime en su plantilla. Así de sensillo, los nombres que declaramos en las rutas serán los que tendrán los atributos del objeto que será retornado por el método params().
 
+<hr>
+
+## __Instalación y ejecución__
+Como mencioné al inico del presente documento la única dependencia utilizada fue la herramienta __Vite__, para su instalación di uso del manejador de paquetes de node __pnpm__ por ello los comandos que recomiendo para instalar las dendencias implican su uso, sin embargo, tanto __npm__ como __pnpm__ comparten repositorio de modulos de node, por ello puede usar el paquete de su preferencia, pero como dije mi recomencación es pnpm:
+
+- para instalación de dependencias:
+~~~bash
+pnpm install
+~~~
+- para ejecución del servidor de desrrollo
+~~~bash
+pnpm dev
+~~~
+- para construcción de versión de producción
+~~~bash
+pnpm build
+~~~
+
+__Y como alternativa puede usar NPM:__
+- para instalación de dependencias:
+~~~bash
+npm install
+~~~
+- para ejecución del servidor de desarrollo
+~~~bash
+npm run dev
+~~~
+- para construcción de versión de producción
+~~~bash
+npm run build
+~~~
+
+<hr>
+
 ## __Conclusiones__
-en proceso...
+Partiendo de un __5 de abril de 2023__ hasta finalizar todos los objetivos propuestos el __17 de abril__ del mismo año, fueron dos semanas de aprendizaje continuo. Aunque inicialmente quise diseñar esta tecnología para realizar proyectos grandes enteramente con ``vanilla javacript`` de forma tal que puediera organizarlo de forma sencilla y eficiente, debo decir que terminé profundizando también en la tecnología que me srivió de,modelo: __React.js__, partiendo muchas veces de la pregunta __¿cómo lo hicieton ellos?__ y respondiendo por mis porpios medios.
+
+Pude familiarizarme mucho más con este lenguaje (_Javascript_) y su relación con el __DOM__, además de poner en práctica bastante lógica y patrones de diseño:
+
+- Patrón __mediador de eventos__
+- Patrón __singleton__
+- Inyección de dependencias
+- Programación orientada a objetos
+  - Herencia
+  - Polimorfismo
+  - Encapsulamiento
+- JSDoc
+- Estructuras de datos
+- Maquetación por componentes
+- Modularización
+
+Finalmente lo que espero con este ejercicio es poder dar cuenta de como mi trayectoria con diversas tecnologías me ha aportado __técnicas__ y __enfoques__ útiles para un uso más probechoso de las herramientas fundamentales, y de la misma forma recibir nuevos aportes para un mejor desempeño en el desarrollo web __front-end__.
+
+Personalmente me encariñé con este proyecto al punto de hacerle su propio logo e imágen jeje. Muchas gracias, ahora a seguir aprendiendo... __¿Cuál será el siguiente paso?__ :)

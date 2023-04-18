@@ -1,8 +1,9 @@
+@import url('./modal.css');
 :root {
   font-family: Century Gothic, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  color: #000;
+  color: #0009;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -10,9 +11,11 @@
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
 }
+
 *{
   box-sizing: border-box;
 }
+
 html{
   margin: 0;
   padding: 0;
@@ -30,6 +33,7 @@ body{
 }
 button{
   border: unset;
+  cursor: pointer;
 }
 
 .none-display{
@@ -94,19 +98,38 @@ h1{
   text-align: center;
   padding-inline: 1rem;
   margin: 0;
+  margin-bottom: 1.5rem;
   box-sizing: border-box;
 }
 a {
   color: #fd004c;
   text-decoration: none;
-  font-weight: bold;
 }
 
 a:hover{
   text-decoration: underline;
 }
+.btn_open-modal{
+  border-radius: 50%;
+  outline: 1px solid #0008;
+  color: #0008;
+  display: grid;
+  place-content: center;
+  width: 2rem;
+  font-size: 1rem;
+  height: 2rem;
+  font-weight: bold;
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  cursor: pointer;
+}
+.btn_open-modal:hover{
+  box-shadow: 0 0 10px 0 #0006;
+}
 
-@media screen and (max-width: 700px) {
+
+@media screen and (max-width: 699.9px) {
   .image, .image_2{
     height: 170px;
   }
@@ -117,5 +140,12 @@ a:hover{
     color: #0008;
     font-size: .8em;
     padding-bottom: 2rem;
+  }
+}
+
+@media screen and (min-width: 700px) {
+  .btn_open-modal{
+    top: 1.3rem;
+    right: 2rem;
   }
 }

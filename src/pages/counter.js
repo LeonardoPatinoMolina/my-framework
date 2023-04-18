@@ -1,3 +1,4 @@
+import { Modal } from "../components/modal";
 import { MyComponent } from "../lib/my_framework/component.js";
 import { MyRouter } from "../lib/my_framework/router";
 
@@ -9,6 +10,7 @@ export class Counter extends MyComponent{
   init(){
     this.state = {
       count: 0,
+      isOpen: false
     };
     
   }
@@ -19,9 +21,21 @@ export class Counter extends MyComponent{
         this.state.count += 1;
       });
     }
+    const closeModal = ()=>{
+      this.update(()=>{
+        this.state.isOpen = false;
+      });
+    };
+    const openModal = ()=>{
+      this.update(()=>{
+        this.state.isOpen = true;
+      });
+    }
 
     return super.template((_)=>`
     <main id="con" class="container" >
+      ${this.state.isOpen && new Modal('modal',{props: closeModal}).attach(this)}
+      <button title="Detalles" class="btn_open-modal" ${_.on('click',openModal)}>!</button>
       <h1 class="titulo">Mi Contador</h2>
       <p align="center">
       <img 

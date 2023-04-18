@@ -1,0 +1,70 @@
+.modal_wrapper{
+  position: fixed;
+  width: 100vw;
+  min-height: 100vh;
+  background-color: #0006;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+}
+.modal{
+  background-color: #fff9;
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  font-size: .8rem;
+  padding: 1rem;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 0 10px 0 #0006;
+}
+.modal h3 {
+  font-size: 1rem;
+  text-align: center;
+  padding: 1rem;
+  line-height: normal;
+  margin: 0;
+}
+.modal p, .contact__list__item {
+  font-size: .9rem;
+  line-height: normal;
+  font-weight: normal;
+}
+.about__list{
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+}
+.contact__list, .about__list, .about__list__item{
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+.about__list__item{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.about__list__item__logo{
+  width: 90px;
+  height: 90px;
+  transform: scale(.8);
+  filter: drop-shadow(0 0 10px #0008);
+}
+
+.contact__list__item{
+  padding: 1rem 0;
+}
+.modal__opctions{
+  margin-top: .5rem;
+  display: flex;
+  justify-content: center;
+}
+
+@media screen and (min-width: 700px) {
+  .modal{
+    width: 50%;
+  }
+}
