@@ -27,7 +27,7 @@ El contenido que documenta el presente proyecto no comprende cada aspecto de la 
   - [MyShelf](#myshelf)
 - [MyRouter](#myrouter)
 - [Instalación y ejecución](#instalación-y-ejecución)
-- [Concluciones](#myrouter)
+- [Concluciones](#conclusiones)
 
 ## __Diagrama de clases__
 Este sencillo diagrama da cuenta de la composición general de las clases que participan del funcionamiento interno de my framework, de zquierda a derecha:
@@ -45,7 +45,7 @@ Este sencillo diagrama da cuenta de la composición general de las clases que pa
 ## __Puntos de Correción__
 
  algunos puntos que quise corregir de mi anterior intento a este son los siguientes: 
-|Característica|Mi pequeño framework|my framework 2.0|
+|Característica|Mi pequeño framework|my framework|
 |---|---|---|
 |__Asíncronía__| no está manejada de la mejor forma, los componentes no puedes renderizarse sin antes haber culminado sus tareas asíncronas, las cuales estan acopladas al proceso de renderizado.| las tareas asíncronas han sido desacopladas del proceso de renderizado y migradas a métodos sobreescritos y un atributo auxiliar para manejarlas más directamente|
 |__Ciclo de vida__| una preocupación demasiado relevante a la hora de añadir lógica, tanto así que es necesario implementar _dos_ métodos distintos para ello, duplicando el trabajo y las posibilidades de error.| ha sido centralizado en el funcionamiento de un atributo __$__ el cual es capaz de ejecutar lógica reactiva, esta característica sería análoga a useEffect de __React.js__.|
@@ -424,7 +424,7 @@ export const Form ()=>{
   );
 }
 ~~~
-Aquí tenemos un rapido ejemplo de un componente funcional de __React.js__ de nombre __Form__ que consiste en un formulario con dos campos de texto que se encuetran controlados por un estado __formData__, se observa el evento ``onChange`` y se maneja actuálizandolo y mostrando siempre el valor ingresado en el atributo value de la etiqueta __input__. Esta es la forma en la que __React.js__ soluciona el problema que he mencionado respecto a la persistencia de los datos ingresados en el formulario, los demás detalles los soluciona de forma interna.
+Aquí tenemos un rápido ejemplo de un componente funcional de __React.js__ de nombre __Form__ que consiste en un formulario con dos campos de texto que se encuetran controlados por un estado __formData__, se observa el evento ``onChange`` y se maneja actuálizandolo y mostrando siempre el valor ingresado en el atributo value de la etiqueta __input__. Esta es la forma en la que __React.js__ soluciona el problema que he mencionado respecto a la persistencia de los datos ingresados en el formulario, los demás detalles los soluciona de forma interna.
 
 Ahora veamos este mismo ejemplo, pero en un componemte de my framework:
 
@@ -827,7 +827,7 @@ npm run build
 <hr>
 
 ## __Conclusiones__
-Partiendo de un __5 de abril de 2023__ hasta finalizar todos los objetivos propuestos el __17 de abril__ del mismo año, fueron dos semanas de aprendizaje continuo. Aunque inicialmente quise diseñar esta tecnología para realizar proyectos grandes enteramente con ``vanilla javacript`` de forma tal que puediera organizarlo de forma sencilla y eficiente, debo decir que terminé profundizando también en la tecnología que me srivió de,modelo: __React.js__, partiendo muchas veces de la pregunta __¿cómo lo hicieton ellos?__ y respondiendo por mis porpios medios.
+Partiendo de un __5 de abril de 2023__ hasta finalizar todos los objetivos propuestos el __17 de abril__ del mismo año, fueron dos semanas de aprendizaje continuo. Aunque inicialmente quise diseñar esta tecnología para realizar proyectos grandes enteramente con ``vanilla javacript`` de forma tal que pudiera organizarlo de forma sencilla y eficiente, debo decir que terminé profundizando también en la tecnología que me sirvió de modelo: __React.js__, partiendo muchas veces de la pregunta __¿cómo lo hicieton ellos?__ y respondiendo por mis propios medios.
 
 Pude familiarizarme mucho más con este lenguaje (_Javascript_) y su relación con el __DOM__, además de poner en práctica bastante lógica y patrones de diseño:
 
