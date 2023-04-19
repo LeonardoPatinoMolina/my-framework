@@ -9,7 +9,7 @@ El presente ejercicio es una continuación de uno anterior llamado __[Mi pequeñ
 > Mi única omisión a la regla de no usar dependencias para el framework fue incluir __Vite__ para la creación de la versión ``build`` minificada, vite es una herramienta muy cómoda y poderosa :). Por otro lado estoy usando un archivo de configuración de typescript para usar su linter, es otra herramienta espectacular.
 
 ## __Contenido__
-El contenido que documenta el presente proyecto no comprende cada aspecto de la implementación y estructura en profundidad de las más de __1200__ líneas de código que fueron necesarias para su realización, se limíta a documentar los aspectos fundamentales y necesarios para su uso y correcto funcionamiento, de suyo sea que los diagramas mostrarán algunos atributos y métodos que no son tratadas de forma concreta en el presente documento.
+El contenido que documenta el presente proyecto no comprende cada aspecto de la implementación y estructura en profundidad de las más de __1200__ líneas de código que fueron necesarias para su realización, se limíta a documentar los aspectos fundamentales y necesarios para su uso y correcto funcionamiento, de suyo sea que los diagramas mostrarán algunos atributos y métodos que no son tratados de forma concreta en el presente documento.
 
 - [Diagrama de clases](#diagrama-de-clases)
 - [Puntos de corrección](#puntos-de-correción)
@@ -113,11 +113,11 @@ export class Counter extends MyComponent{
   }
 }
 ~~~
-Inmediatamente se puede apreciar que se trata de un __componente de clase__, efectivamente my framework tiene como base componetes de clase, tal y como lo era mi anterior ejecicio: [Mi pequeño framework font-end](https://github.com/LeonardoPatinoMolina/my-peque-o-framework), pero este es mucho más elegante, este componente es reactivo, es capaz de re renderizarse para actualizar la vista, pero primero señalaré aspectos más fundamentales. El compomnente __Counter__ está heredando de la clase __Component__, esta exije obligatoriamente como primer argumento un __string__, este debe ser un dato único debido a que será la identidad del componente, lo que lo distinque de los demás, una especie de ``key`` (de hecho así se llama jeje).
+Inmediatamente se puede apreciar que se trata de un __componente de clase__, efectivamente my framework tiene como base componetes de clase, tal y como lo era mi anterior ejecicio: [Mi pequeño framework font-end](https://github.com/LeonardoPatinoMolina/my-peque-o-framework), pero este es mucho más elegante, este componente es reactivo, es capaz de re renderizarse para actualizar la vista, pero primero señalaré aspectos más fundamentales. El componente __Counter__ está heredando de la clase __MyComponent__, esta exije obligatoriamente como primer argumento un __string__, este debe ser un dato único debido a que será la identidad del componente, lo que lo distinque de los demás, una especie de ``key`` (de hecho así se llama jeje).
 
 En este caso tenemos un clásico contador, gracias a este ejemplo tan típico tengo espacio para exponer rápidamente la existencia del estado, este es un dato que persiste entre re renderizados, pero no no persiste ante desrenderizados, ya llegaremos allá.
 
-La __key__ en los compomnentes que serán páginas en el enrutador deben estar explicitas en el constructor, ya que es requisito obligatorio para el funcionamiento interno de my framework, los componentes page deben tener este constructor sin parámetros tal y como se ve en el ejemplo anterior:
+La __key__ en los componentes que serán páginas en el enrutador deben estar explicitas en el constructor, ya que es requisito obligatorio para el funcionamiento interno de my framework, los componentes page deben tener este constructor sin parámetros tal y como se ve en el ejemplo anterior:
 ~~~Javascript
   constructor(){
     super('home-page'); //key
@@ -125,7 +125,7 @@ La __key__ en los compomnentes que serán páginas en el enrutador deben estar e
 ~~~
 
 
-### __Component__
+### __MyComponent__
 La clase cuenta con __diez 10__ atributos públicos que tendremos a nuestra disposición para diversar operaciones, son los siguientes:
 
 ### __Atributos__
@@ -139,7 +139,7 @@ La clase cuenta con __diez 10__ atributos públicos que tendremos a nuestra disp
 - __key__: cadena de texto que identifica al componente y lo distinque de los demás.
 - __parent__: este atributo hace referencia al componente que funge como padre del presente componente, si por el contrario no hace parte de la familia de ningun otro, el atributo permanece en ``undefined``
 - __props__: atributo inyectable por el constructor, este puede ser cualquier dato que quiera recibirse desde su invocación, es lo que permite al componente _padre_ comunicarse con el _hijo_, a estas alturas habrás reconocido muchas similitudes con _react.js_
-- __state__: este atributo corresponde al _estado_ del componente, la principal caracteristica de este atributo es que tiene la capacidad de ``persisitir`` entre re renderizados, y por supuesto puede transmitirse a sus componentes hijos.
+- __state__: este atributo corresponde al _estado_ del componente, la principal característica de este atributo es que tiene la capacidad de ``persisitir`` entre re renderizados, y por supuesto puede transmitirse a sus componentes hijos.
 
 ### __Métodos__
 Ahora pasamos a los métodos, la clase Component sin contar el método contructor, posee __nueve__ métodos púbicos puestos a nuestra disposición para realizar diversas funciones, de estos 9, __tres__ están destniados a ser sobreescritos, __tres__ de los 9 son _obligatorios_ si queremos un mínimo para la adecuada funcionalidad del componente y como último detalle __dos__ de los 9 no están destinados a uso regular, son propiamente utilizados por la lógica interna del framework, sin embargo, conviene conocerlos. clasificados son los siguientes: 

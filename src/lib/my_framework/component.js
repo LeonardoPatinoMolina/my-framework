@@ -207,7 +207,7 @@ export class MyComponent {
   */
   async #didUnmount(){
     if(!this.#initialized) return;
-    // this.$.dispose();
+    this.$.dispose();
     this.#eventController.removeEvents();
     this.#inputController.removeInputController();
     this.#rendered = false;
@@ -224,7 +224,7 @@ export class MyComponent {
   */
  async #didUpdate(){
   if(this.#firstMount) return;
-    // this.$.update();
+    this.$.update();
     this.ready();
     this.#inputController.addInputController();
     this.#eventController.addEvents();
