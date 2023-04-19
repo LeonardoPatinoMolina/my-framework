@@ -1,6 +1,6 @@
 import { MyComponent } from "./component.js";
 
-export class Life {
+export class LifeComponent {
 
   /**definicion de tipos con fines de organización
    * @typedef {{dispose: (()=>void)|undefined, update: (()=>void)|(()=>DisposeEvent), dependency: Dependecy, oldDependency: string}} EffectT

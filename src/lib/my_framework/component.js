@@ -1,7 +1,7 @@
 "use strict"
 import { EventController } from "./eventController";
 import { InputController } from "./inputController";
-import { Life } from "./lifeComponent.js";
+import { LifeComponent } from "./lifeComponent.js";
 import { MyDOM } from "./myDOM.js";
 
 /**
@@ -68,7 +68,7 @@ export class MyComponent {
 
   /** Atributo encargado de subscribir lógica al ciclo de
    * vida del componente
-   * @type {Life}
+   * @type {LifeComponent}
    */
   $;
 
@@ -98,7 +98,7 @@ export class MyComponent {
       return comp
     }
   
-    this.$ = new Life(this);
+    this.$ = new LifeComponent(this);
     this.init();
     MyDOM.initFamily(this);
     MyDOM.setMember(this);
