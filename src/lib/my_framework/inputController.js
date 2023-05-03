@@ -64,10 +64,16 @@ export class InputController {
     this.#inputcontrollers.forEach((controller)=>{
       const abortC = new AbortController();
       this.#abortControllers.set(controller.targetKey, abortC);
+      
       /**
        * @type {HTMLInputElement}
        */
-      const target = this.#owner.body.querySelector(`[data-keycontroller="${controller.targetKey}"]`);
+      let target;
+      target = this.#owner.body.querySelector(`[data-keycontroller="${controller.targetKey}"]`);
+      if(target === null && this.#owner.body.getAttribute("data-keycontroller") === controller.targetKey){
+        //@ts-ignore
+        target = this.#owner.body
+      }
 
       target.selectionStart = controller.state.positionStart;
       target.selectionEnd = controller.state.positionEnd;

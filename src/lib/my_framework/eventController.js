@@ -64,8 +64,17 @@ export class EventController{
     this.#eventHandlers.forEach((e)=>{
       const abortC = new AbortController();
       this.#abortControllers.set(e.keyEvent, abortC);
-      // console.log(this.key, this.#eventHandlers.length);
-      const target = this.#owner.body.querySelector(`[data-keyevent="${e.keyEvent}"]`)
+      /**
+      verificamos si el nodo principal del componente owner, es el objetivo
+      esto asegura que ubiquemos el nodo que require el evento de forma adecuada
+       * @type {Element}
+       */
+      let target;
+      target = this.#owner.body.querySelector(`[data-keyevent="${e.keyEvent}"]`);
+      if(target === null && this.#owner.body.getAttribute("data-keyevent") === e.keyEvent){
+        target = this.#owner.body
+      }
+
       target.addEventListener(e.name,(evnt)=>{
         e.callback(evnt);
       },{...e.config, signal: abortC.signal});//end addEvnetListener
