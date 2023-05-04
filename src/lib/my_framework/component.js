@@ -1,6 +1,6 @@
 "use strict"
-import { EventController } from "./eventController";
-import { InputController } from "./inputController";
+import { EventController } from "./eventController.js";
+import { InputController } from "./inputController.js";
 import { LifeComponent } from "./lifeComponent.js";
 import { MyDOM } from "./myDOM.js";
 
@@ -141,14 +141,15 @@ export class MyComponent {
    * Metodo encargado de realizar un acoplamiento de componentes
    * en lote, esto reduce las manipulaciones de DOM de 1-N a 1
    * por acople
-   * @param {function(new:MyComponent, {})} ClassComponent 
+   * @param {function(new:MyComponent, string,{})} ClassComponent 
    * @param {MyComponent} parent 
    * @param {Array<any>} dataBuilder 
    */
   static attachMany(ClassComponent, parent, dataBuilder){
     let rootsString = '';
     dataBuilder.forEach((args)=>{
-      const newComponent = new ClassComponent(args);
+
+      const newComponent = new ClassComponent(args.key, args);
       if(!MyDOM.getFamily(parent).has( newComponent.key)){
         MyDOM.setChild(parent, newComponent);
       }
@@ -189,11 +190,12 @@ export class MyComponent {
   async #didMount(){
     try {
       if(!this.#initialized) {
-        this.ready();
         this.#eventController.addEvents();
         this.#inputController.addInputController();
         this.$.initialize();
         this.#initialized = true;
+        this.#rendered = true;
+        this.ready();
       }
     } catch (error) {
       console.log('jajja');
@@ -207,16 +209,15 @@ export class MyComponent {
   */
   async #didUnmount(){
     if(!this.#initialized) return;
-    this.$.dispose();
     this.#eventController.removeEvents();
     this.#inputController.removeInputController();
-    this.#rendered = false;
-    this.#firstMount = false;
-
+    
     MyDOM.getFamily(this).forEach(childKey=>{
       const child = MyDOM.getMember(childKey)
       child.#didUnmount();
     })//end foreach
+    this.#firstMount = false;
+    this.#rendered = false;
   }//end didUnmount
 
   /**
@@ -224,15 +225,15 @@ export class MyComponent {
   */
  async #didUpdate(){
   if(this.#firstMount) return;
-    this.$.update();
-    this.ready();
     this.#inputController.addInputController();
     this.#eventController.addEvents();
-
+    
     MyDOM.getFamily(this).forEach(childKey=>{
       const child = MyDOM.getMember(childKey)
       child.#didUpdate();
     })//end foreach
+    this.#rendered = true;
+    this.ready();
   }//end didUpdate
 
   /**
@@ -259,7 +260,7 @@ export class MyComponent {
 
   /**
    * Encargado de generar la plantilla del componente
-   * @param {(_: {on: (name: string, callback: any)=>string, inputController: (callback: any)=>string})=>string} template 
+   * @param {(_: {on: (name: string, callback: any)=>string, inputController: (name: string, stateName: string,callback?: (string)=>string)=>string})=>string} template 
    * @returns {string} plantilla de componente
    */
   template(template){
@@ -272,11 +273,12 @@ export class MyComponent {
        return this.#eventController.onEvent(name, callback);
       },
       /**
-       * @param {any} callback 
+       * @param {string} stateName - nombre del estado pricipal del controlador
+       * @param {string} name - nombre del estado dedicado al input actual
+       * @param {(string)=>string=} callback - 
        */
-      inputController: (callback)=>{
-        // return this.#onInputController(callback);
-        return this.#inputController.onInputController(callback);
+      inputController: (stateName, name, callback)=>{
+        return this.#inputController.onInputController(name, stateName, callback);
       }
     }
 
@@ -365,7 +367,6 @@ export class MyComponent {
     }else{
       root.replaceWith(fragment);
     }
-    this.#rendered = true;
   }//end render
 
   /**

@@ -366,7 +366,7 @@ element.addEventListener('click', addCount)
 ~~~
 Pero este evento es añadido a la etiqueta puntual en la que se declara, por ello es una asignación de evento en línea, y pueden añadirse tantos como se necesite en un solo componente, teniendo como limitación lo que __Javascript__ o __HTML__ nos imponga. Estos son administrados internamente, no hace falta preocuparse por removerlos, eso es tarea de my framework, internamente se determina cual es el momento oportuno para ello.
 
-### __InputController(callback) y formularios controlados__
+### __InputController(name, stateName, callback) y formularios controlados__
 Este fue el principal reto de esta inventiva, identifiquemos primero cual es el problema a resolver.
 
 #### __El problema__
@@ -381,9 +381,9 @@ Esta situación acarrea una serie de problemas con arreglo a la experiencia del 
 
 >``Nota:`` Me reservo los detalles internos de su implementación, tiene a su disposición el código empleado para ello.
 
-La solución consistió en una combinación del resguardo de: datos ingresados, posición del cursor y estado de foco del campo involucrado. la sintaxis final resultó ser sencilla. Antes de recurrir a un ejemplo de my farmework veamos cómo es un ``formulario controlado`` en una biblioteca de componentes reactivos como __React.js__:
+La solución consistió en una combinación del resguardo de los datos ingresados y el estado de foco del campo involucrado. la sintaxis final resultó ser sencilla. Antes de recurrir a un ejemplo de my framework veamos cómo es un ``formulario controlado`` en una biblioteca de componentes reactivos como __React.js__:
 
-~~~Javascript
+~~~javascript
 "use strict"
 import { useState } from 'react';
 
@@ -396,6 +396,9 @@ export const Form ()=>{
 
   const changeHandler = ({target}) =>{
     const {name, value} = target;
+    //manipulamos el valor a nuestro antojo
+    //para ser asignado al campo con un control previo
+    
     setFormData(prevData => ({
       ...prevData, 
       [name]: value
@@ -427,7 +430,7 @@ export const Form ()=>{
   );
 }
 ~~~
-Aquí tenemos un rápido ejemplo de un componente funcional de __React.js__ de nombre __Form__ que consiste en un formulario con dos campos de texto que se encuetran controlados por un estado __formData__, se observa el evento ``onChange`` y se maneja actuálizandolo y mostrando siempre el valor ingresado en el atributo value de la etiqueta __input__. Esta es la forma en la que __React.js__ soluciona el problema que he mencionado respecto a la persistencia de los datos ingresados en el formulario, los demás detalles los soluciona de forma interna.
+Aquí tenemos un rápido ejemplo de un componente funcional de __React.js__ de nombre __Form__ que consiste en un formulario con dos campos de texto que se encuetran controlados por un estado __formData__, se observa el evento ``onChange`` y se maneja actualizándolo y mostrando siempre el valor ingresado en el atributo value de la etiqueta __input__, esto permite que podamos manipular el valor del campo a nuestro antojo. Esta es la forma en la que __React.js__ soluciona el problema que he mencionado respecto a la persistencia de los datos ingresados en el formulario, los demás detalles los soluciona de forma interna.
 
 Ahora veamos este mismo ejemplo, pero en un componente de my framework:
 
@@ -437,7 +440,7 @@ import { MyComponent } from "../lib/my_framework/component.js";
 
 export class Form extends MyComponent{
   constructor(){
-    super('form');
+    super('form');//key
   }
 
   init(){
@@ -450,16 +453,12 @@ export class Form extends MyComponent{
   }
 
   build(){
-    const inputsHandler = ({target})=>{
-      const { name, value } = target;
-
-      this.update(()=>{
-        this.state.formData = {
-          ...this.state.formData,
-          [name]: value
-        }
-      })
+    const controlValue = (value)=>{
+      //manipulamos el valor a nuestro antojo
+      //para ser asignado al campo con un control previo
+      return value;
     }
+  }
 
     return super.template((_)=>`
     <form ${_.on('submit',(e)=>{e.preventDefault()})}>
@@ -467,18 +466,16 @@ export class Form extends MyComponent{
         nombre:
         <input 
           type="text" 
-          ${_.inputController(inputsHandler)} 
+          ${_.inputController("formData","nombre",controlValue)} 
           name="nombre"
-          value="${this.state.formData.nombre}"
         >
       </label>
       <label>
         apellido:
         <input 
           type="text" 
-          ${_.inputController(inputsHandler)} 
+          ${_.inputController("formData","apellido",controlValue)} 
           name="apellido"
-          value="${this.state.formData.apellido}"
         >
       </label>
       <button type="submit">Enviar</button>
@@ -487,7 +484,9 @@ export class Form extends MyComponent{
   }
 }
 ~~~
-En este ejemplo vemos exactamente la misma situación que con el componente Form de _React.js_, pero con todas las reglas de my framework y sus métodos. La sintaxis es semejante a un __eventController()__, pero no podemos afirmar que se trata de un __addEventListener__, este es un controlador específico para etiquetas de entrada de teclado, lo cual incluye:
+En este ejemplo vemos la misma situación que con el componente Form de _React.js_, pero con todas las reglas de my framework y sus métodos. En este caso particular declaramos un estado llamado __formData__, este estado representa el nombre del controlador, y equivalé a la cedena de texto que recibirá como primer parámetro, este objeto representa todos los inputs que están siendo controlados, puntualmente sus atributos __value__, a través de el podemos inicializar los cmapos con algún valor inicial. 
+
+ La sintaxis es semejante a un __eventController()__, pero no podemos afirmar que se trata de un __addEventListener__, este es un controlador específico para etiquetas de entrada de teclado, lo cual incluye:
 ~~~html
 <input type="text">
 <input type="number">
@@ -499,9 +498,16 @@ En este ejemplo vemos exactamente la misma situación que con el componente Form
 <textarea></textarea>
 ~~~
 
-Y al ser tan especializado, no ocupa nombrar algún evento, basta con administrarle el callback o manejador que recibirá el evento y se ejecutará al momento que se dispare.
-
 > ``Importante:`` evidentemente no están contempladas todas las etiquetas __input__, debido a que solo las previamente señaladas originaron la necesidad de esta solución tan específica; para controlar el resto de etiquetas _input_ como checkbox o radio, etc. puede optar por el __eventController()__ y manejar su valor con el evento que corresponda, en esos casos el _inputController_ no funcionará adecuadamente y sufrirá comportamientos inesperados.
+
+#### __Parametros__
+``name:`` consiste en el nombre del controlador, se asume que tendremos un controlador por formulario, esto no significa una sola invocación, sino un espacio del estado que será dedicado al contenido de los valores ingresador en las etiquetas inputs, en este ejemplo pudimos observar que este parametro corresponde al estado __formData__.
+``nameState:`` refiere al nombre del estado que corresponde a al etiqueta input en el que se declara el __inputController__, este corresponde a uno de los atributos del estado del controlador, en el casso anterior serían los atributos __nombre__ o __apellido__.
+
+``callback(value):`` este parámero es opcional, recibe como parámetro el valor actual del input y obligatoriamente debe retornar una cadena de texto que corresponde al nuevo valor luego de realizarle los cambios de nuestro interés. Es a travéz de este que podemos controlar el valor ingresado en la etiqueta con la garantía de la peristencia de la información entre re-renderizados.
+
+#### __Últimas apreciaciones__
+Es importante recalcar que esta implementación no consiste en formularios reactivos, sino formularios controlados con persistencia de datos.
 
 <hr>
 

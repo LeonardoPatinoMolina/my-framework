@@ -2,7 +2,7 @@ import { MyComponent } from "./component.js";
 
 export class InputController {
   /**
-   * @typedef {{state: {value: string, positionStart: number, positionEnd: number, isFocus: boolean}, callback: (e: any)=>void, targetKey: string}} Controller
+   * @typedef {{state: {value: string, name: string, stateName: string, isFocus: boolean}, targetKey: string, callback?: (value: string)=>string}} Controller
    */
 
   /** componente propieatario del presente controlador
@@ -35,19 +35,24 @@ export class InputController {
 
   /** Se eccarga de administrar los selectores necesarios para
    * añadir los escucha de eventos en linea
-   * @param {(e: any)=>void} callback
+   * @param {string} name
+   * @param {string} stateName
+   * @param {(string)=>string=} callback
    * @returns {string}
    */
-  onInputController(callback){
+  onInputController(name, stateName, callback){
     const keycontroller = `${this.#owner.key}-controller-${this.#counterKeyController}`;
 
     if(!this.#owner.isInitialized){
+
+      const curValue = this.#owner.state[stateName] ? this.#owner.state[stateName][name] : undefined;
+
       this.#inputcontrollers.set(keycontroller, {
         callback,
         state: {
-          value: '', 
-          positionStart: 0, 
-          positionEnd: 0,
+          name,
+          stateName,
+          value: curValue ?? '',
           isFocus: false
         },
         targetKey: keycontroller
@@ -75,31 +80,35 @@ export class InputController {
         target = this.#owner.body
       }
 
-      target.selectionStart = controller.state.positionStart;
-      target.selectionEnd = controller.state.positionEnd;
       if(controller.state.isFocus) target.focus();
       else target.blur();
+      target.value = controller.state.value;
       
-      target.addEventListener('keyup',(e)=>{
+      target.addEventListener('keypress',(e)=>{
+      //en caso de existir un callback de constrol, lo ejecutamos
+        const newValue = controller.callback ? controller.callback(target.value) : undefined;
+        const curValue = newValue ?? target.value;
+
         controller.state = {
-          value: target.value,
-          positionStart: target.selectionStart,
-          positionEnd: target.selectionEnd,
+          ...controller.state,
+          value: curValue,
           isFocus: true
         };
-    
-        controller.callback(e);
+        target.value = curValue;
+        this.#owner.state = {
+          ...this.#owner.state,
+          [controller.state.stateName]:{
+            [controller.state.name]: curValue
+          }
+        };
       },{signal: abortC.signal});// end keyup eventlistener
 
-      document.addEventListener('click',(e)=>{
-        if(e.target !== target){
-          controller.state = {
-            value: target.value,
-            positionStart: target.selectionStart,
-            positionEnd: target.selectionEnd,
-            isFocus: false
-          };
-        }
+      target.addEventListener('blur',(e)=>{
+        controller.state = {
+          ...controller.state,
+          value: target.value,
+          isFocus: false
+        };
       },{signal: abortC.signal});// end click eventlistener
     })
   }//end addController

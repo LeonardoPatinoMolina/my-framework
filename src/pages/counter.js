@@ -1,6 +1,6 @@
-import { Modal } from "../components/modal";
+import { Modal } from "../components/modal.js";
 import { MyComponent } from "../lib/my_framework/component.js";
-import { MyRouter } from "../lib/my_framework/router";
+import { MyRouter } from "../lib/my_framework/router.js";
 
 export class Counter extends MyComponent{
   constructor(){
