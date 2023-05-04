@@ -89,7 +89,7 @@ export class MyDOM {
    * @param {MyComponent} child 
    */
   static removeChild(parent, child){
-    const family = new MyDOM().family.get(parent.key);
+    const family = new MyDOM().family.get(parent?.key);
     if(family){
       family.delete(child.key);
     }
